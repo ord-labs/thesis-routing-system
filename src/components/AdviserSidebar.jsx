@@ -44,7 +44,7 @@ const SidebarSection = ({ title, active, setActiveSection, links, icon }) => {
   );
 };
 
-const StudentSidebar = () => {
+const AdviserSidebar = () => {
   const [activeSection, setActiveSection] = useState("Title Proposal");
 
   return (
@@ -102,4 +102,4 @@ const StudentSidebar = () => {
   );
 };
 
-export default StudentSidebar;
+export default AdviserSidebar;
