@@ -29,15 +29,24 @@ const AdminSidebar = () => {
           title="Title Proposal"
           active={activeSection}
           setActiveSection={setActiveSection}
-          links={["Draft Proposal", "Submission", "Approval Status", "Indorsement Form"]}
+          links={[
+            { name: "route 1", href: "/admin/proposal/route-1" },
+            { name: "route 2", href: "/admin/proposal/route-2" },
+            { name: "route 3", href: "/admin/proposal/route-3" },
+            { name: "Indorsement Form", href: "/admin/proposal/endorsement" },
+          ]}
         />
         
         <SidebarSection
           icon={BookOpen}
-          title="Final Defense"
+          title="Final"
           active={activeSection}
           setActiveSection={setActiveSection}
-          links={["Schedule", "Documents", "Results"]}
+          links={[
+            { name: "route 1", href: "/admin/final/route-1" },
+            { name: "route 2", href: "/admin/final/route-2" },
+            { name: "route 3", href: "/admin/final/route-3" },
+          ]}
         />
         
         <SidebarSection
@@ -45,7 +54,10 @@ const AdminSidebar = () => {
           title="Register Account"
           active={activeSection}
           setActiveSection={setActiveSection}
-          links={["Panel Members", "Adviser", "Committee"]}
+          links={[
+            { name: "adviser", href: "/admin/register/adviser" },
+            { name: "panel", href: "/admin/register/panel" },
+          ]}
         />
         
         <div className="mt-4 pt-4 border-t border-gray-700">

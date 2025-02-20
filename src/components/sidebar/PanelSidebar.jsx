@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, LogOut, LayoutDashboard, BookOpen, UserPlus, FileText, User, Settings } from "lucide-react";
+import { LogOut, LayoutDashboard, BookOpen, UserPlus, FileText, User, Settings } from "lucide-react";
 import SidebarSection from "./SidebarSection";
 
 const PanelSidebar = () => {
@@ -29,15 +29,23 @@ const PanelSidebar = () => {
           title="Title Proposal"
           active={activeSection}
           setActiveSection={setActiveSection}
-          links={["Draft Proposal", "Submission", "Approval Status", "Indorsement Form"]}
+          links={[
+            { name: "route 1", href: "/panel/proposal/route-1" },
+            { name: "route 2", href: "/panel/proposal/route-2" },
+            { name: "route 3", href: "/panel/proposal/route-3" },
+          ]}
         />
         
         <SidebarSection
           icon={BookOpen}
-          title="Final Defense"
+          title="Final"
           active={activeSection}
           setActiveSection={setActiveSection}
-          links={["Schedule", "Documents", "Results"]}
+          links={[
+            { name: "route 1", href: "/panel/final/route-1" },
+            { name: "route 2", href: "/panel/final/route-2" },
+            { name: "route 3", href: "/panel/final/route-3" },
+          ]}
         />
         
         <div className="mt-4 pt-4 border-t border-gray-700">
