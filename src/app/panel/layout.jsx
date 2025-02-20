@@ -1,8 +1,15 @@
-// Import the user-custom sidebar here
-import React from 'react';
+import PanelSidebar from "../../components/PanelSidebar";
+import React from "react";
 
 const layout = ({ children }) => {
-	return <div>{children}</div>;
+  return (
+    <div className="flex h-screen">
+      <PanelSidebar />
+      <main className="flex-1 overflow-y-auto bg-gray-100 p-6">
+        {children}
+      </main>
+    </div>
+  );
 };
 
 export default layout;
