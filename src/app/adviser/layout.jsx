@@ -1,4 +1,4 @@
-import AdviserSidebar from "../../components/AdviserSidebar";
+import AdviserSidebar from "../../components/sidebar/AdviserSidebar";
 import React from "react";
 
 const layout = ({ children }) => {
