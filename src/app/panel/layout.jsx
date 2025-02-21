@@ -1,4 +1,4 @@
-import PanelSidebar from "../../components/PanelSidebar";
+import PanelSidebar from "../../components/sidebar/PanelSidebar";
 import React from "react";
 
 const layout = ({ children }) => {

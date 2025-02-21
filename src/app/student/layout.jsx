@@ -1,4 +1,4 @@
-import StudentSidebar from "../../components/StudentSidebar";
+import StudentSidebar from "../../components/sidebar/StudentSidebar";
 import React from "react";
 
 const layout = ({ children }) => {
