@@ -1,7 +1,10 @@
 import React from 'react';
+import Route1 from './proposal/route-1/page';
 
 const Adviser = () => {
-	return <div>Adviser</div>;
+	return (
+		<Route1 />
+	);
 };
 
 export default Adviser;

@@ -1,7 +1,10 @@
 import React from 'react';
+import Route1 from './proposal/route-1/page';
 
 const Admin = () => {
-	return <div>Admin</div>;
+	return (
+		<Route1 />
+	);
 };
 
 export default Admin;
