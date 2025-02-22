@@ -1,10 +1,10 @@
-import TopMenu from '../../../../components/menu/TopMenu';
-import { studentContent } from '../../../../content/student/studentContent';
+import StudentTopMenu from '../../../../components/menu/StudentTopMenu';
+import TopMenu from '../../../../components/menu/StudentTopMenu';
 
 const Page = () => {
 	return (
 		<div>
-			<TopMenu menuItems={studentContent.menuItems} />
+			<StudentTopMenu />
 		</div>
 	);
 };
