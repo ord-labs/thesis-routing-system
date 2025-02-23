@@ -56,6 +56,7 @@ export default function Home() {
 			</h1>
 
 			<div className="flex flex-col justify-center bg-white w-[40%] rounded-lg mx-auto p-8">
+				<p className="text-center font-semibold mb-2">Select User Type</p>
 				{buttonData.map((data, index) => (
 					<TRSButton
 						key={`button-${index}`}

@@ -41,8 +41,8 @@ const Page = () => {
 			<div className="flex flex-col justify-center bg-white w-[40%] rounded-lg mx-auto p-8">
 				<h1 className="text-center font-semibold text-xl mb-8">Admin Login</h1>
 				<TRSInput
-					label={'ID Number'}
-					placeholder={'Enter your ID Number'}
+					label={'Email Address'}
+					placeholder={'Enter your email address'}
 					value={idnumber}
 					onChange={(e) => setIdnumber(e.target.value)}
 				/>
