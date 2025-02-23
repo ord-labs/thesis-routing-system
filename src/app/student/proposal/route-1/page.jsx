@@ -1,11 +1,13 @@
 import { FileUp } from 'lucide-react';
 import FileCard from '../../../../components/card/FileCard';
-import StudentTopMenu from '../../../../components/menu/StudentTopMenu';
+import TRSButton from '../../../../components/button/TRSButton';
 
 const Page = () => {
 	return (
-		<div className='flex flex-col gap-4 text-white'>
-			<StudentTopMenu />
+		<div className=' text-white'>
+			<div className='ml-12 md:ml-0 mb-4'>
+				<TRSButton label={<FileUp />} onClick={console.log('asjkdfnkj')} />
+			</div>
 			<FileCard/>
 		</div>
 	);
