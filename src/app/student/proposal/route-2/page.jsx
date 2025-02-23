@@ -1,7 +1,13 @@
 import React from 'react';
+import TopMenu from '../../../../components/menu/StudentTopMenu';
+import StudentTopMenu from '../../../../components/menu/StudentTopMenu';
 
 const Page = () => {
-	return <div>Route 2</div>;
+	return (
+		<div>
+			<StudentTopMenu	/>
+		</div>
+	);
 };
 
 export default Page;
