@@ -22,7 +22,7 @@ const StudentSidebar = () => {
     <>
       {/* Mobile menu button */}
       <button
-        className="md:hidden fixed left-4 top-4 z-50 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white"
+        className="md:hidden fixed left-6 top-8 z-50 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
