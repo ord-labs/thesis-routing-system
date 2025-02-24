@@ -16,7 +16,7 @@ const FileCard = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
-        <div className="w-80 flex flex-col items-center border shadow-md  rounded-lg ">
+        <div className="w-[90%] md:w-80 flex flex-col items-center  border shadow-md  rounded-lg ">
           
           <div className="w-full flex justify-end    px-2 bg-gray-700 rounded-t-lg ">
             <Ellipsis size={30} className="text-white cursor-pointer" onClick={e => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen)} }/>
@@ -36,6 +36,7 @@ const FileCard = () => {
             </p>
         </div>
 
+        {/* Modal */}
         <Modal isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
                 <h2 className="text-xl font-bold mb-4">Details</h2>
                 <div className="flex flex-col gap-7 p-3 bg-gray-600 rounded-lg">

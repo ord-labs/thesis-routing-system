@@ -7,11 +7,13 @@ import SubmitFile from '../../../../components/button/SubmitFile';
 
 const Page = () => {
 	return (
-		<div className=' text-white'>
-			<div className='ml-12 md:ml-0 mb-4'>
+		<div className='  flex flex-col justify-center md:items-start'>
+			<div className=' md:ml-0 mb-4 ml-12 '>
 				<SubmitFile/>
 			</div>
-			<FileCard/>
+			<div className='w-full flex justify-center md:justify-start'>
+				<FileCard/>
+			</div>
 		</div>
 	);
 };
