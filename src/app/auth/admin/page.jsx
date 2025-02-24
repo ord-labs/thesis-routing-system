@@ -6,16 +6,26 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { FormInput } from 'lucide-react';
 import TRSInput from '../../../components/input/TRSInput';
+import { useAuthStore } from '../../../stores/useAuthStore';
 
 const Page = () => {
 	const router = useRouter();
 
-	const [idnumber, setIdnumber] = useState('');
+	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
-	useEffect(() => {
-		console.log(idnumber, password);
-	}, [idnumber, password]);
+	const { loginAdmin } = useAuthStore((state) => state);
+
+	const handleLogin = async () => {
+		await loginAdmin(email, password).then((res) => {
+			if (res.accessToken) {
+				localStorage.setItem('accessToken', res.accessToken);
+				router.push('/admin');
+			} else {
+				alert('Invalid email or password');
+			}
+		});
+	};
 
 	return (
 		<div className="flex flex-col justify-center gap-y-8 bg-smccprimary  w-full h-screen">
@@ -38,13 +48,13 @@ const Page = () => {
 				THESIS ROUTING SYSTEM
 			</h1>
 
-			<div className="flex flex-col justify-center bg-white w-[40%] rounded-lg mx-auto p-8">
+			<div className="flex flex-col justify-center bg-white w-[90%] md:w-[60%] lg:w-[40%] rounded-lg mx-auto p-8">
 				<h1 className="text-center font-semibold text-xl mb-8">Admin Login</h1>
 				<TRSInput
 					label={'Email Address'}
 					placeholder={'Enter your email address'}
-					value={idnumber}
-					onChange={(e) => setIdnumber(e.target.value)}
+					value={email}
+					onChange={(e) => setEmail(e.target.value)}
 				/>
 				<TRSInput
 					label={'Password'}
@@ -53,7 +63,7 @@ const Page = () => {
 					onChange={(e) => setPassword(e.target.value)}
 					type="password"
 				/>
-				<TRSButton label={'Login'} onClick={() => {}} />
+				<TRSButton label={'Login'} onClick={handleLogin} />
 			</div>
 		</div>
 	);
