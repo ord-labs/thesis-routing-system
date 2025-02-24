@@ -39,7 +39,7 @@ const Page = () => {
 				THESIS ROUTING SYSTEM
 			</h1>
 
-			<div className="flex flex-col justify-center bg-white w-[40%] rounded-lg mx-auto p-8">
+			<div className="flex flex-col justify-center bg-white w-[90%] md:w-[60%] lg:w-[40%] rounded-lg mx-auto p-8">
 				<h1 className="text-center font-semibold text-xl mb-8">
 					Student Login
 				</h1>
