@@ -2,17 +2,12 @@ import { IKUpload, ImageKitProvider } from "imagekitio-next"
 import { useRef } from "react";
 import TRSButton from "./TRSButton";
 import { FileUp } from "lucide-react";
+import { useThesisStore } from "../../stores/useThesisStore";
+import { thesisModel } from "../../models/thesisModel";
 
 const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT;
 const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY;
 
-const onError = (err) => {
-    console.log("Error", err);
-  };
-  
-  const onSuccess = (res) => {
-    console.log("Success", res);
-  };
   
 const authenticator = async () => {
   try {
@@ -32,6 +27,30 @@ const authenticator = async () => {
 };
 
 const SubmitFile = () => {
+  const createThesis = useThesisStore((state) => state.createThesis);
+  
+  const onError = (err) => {
+    console.log("Error", err);
+  };
+
+  const onSuccess = async (res) => {
+    console.log("Success", res);
+
+    try {
+      // placeholder for testing
+      const thesis = thesisModel(
+        res.name, 
+        res.url,
+        'kajsnd',
+        'route-1',
+        ['member 1', 'member 2', 'member 3'],
+        'akjsdnd'
+    );
+      await createThesis(thesis);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const ikUploadRef = useRef(null)
   

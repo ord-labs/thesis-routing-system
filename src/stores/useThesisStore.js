@@ -22,8 +22,12 @@ import {
 	updateDoc,
 	query,
 	where,
+	addDoc,
 } from 'firebase/firestore';
-import { app } from '@/firebaseConfig'; // Import Firebase config
+import { app } from '..//server/firebase' 
+import { studentModel } from '../models/studentModel';
+import { panelModel } from '../models/panelModel';
+import { adviserModel } from '../models/adviserModel';
 
 const db = getFirestore(app);
 
@@ -50,9 +54,8 @@ export const useThesisStore = create((set) => ({
 
 	createThesis: async (thesis) => {
 		try {
-			const thesisRef = doc(collection(db, 'thesis')); // Auto-generate ID
-			await setDoc(thesisRef, { ...thesis, current_route: 1, comments: [] }); // Start at Route 1
-			return { success: true, id: thesisRef.id };
+			const thesisRef = await addDoc(collection(db, 'thesisPaper'), thesis);
+			return { success: true };
 		} catch (error) {
 			console.error('Error creating thesis:', error);
 			return { success: false, error: error.message };
