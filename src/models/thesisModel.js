@@ -3,7 +3,6 @@ export const thesisModel = (title, fileUrl, studentId, currRoute, members, deadl
     fileUrl,
     studentId,
     currRoute,
-    members,
-    deadline,
+    // deadline,
     createdAt: new Date()
 });

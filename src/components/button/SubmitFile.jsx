@@ -36,17 +36,19 @@ const SubmitFile = () => {
   const onSuccess = async (res) => {
     console.log("Success", res);
 
+    const pathnameParts = window.location.pathname.split('/').filter(Boolean);
+    const lastSegment = pathnameParts[pathnameParts.length - 1];
     try {
-      // placeholder for testing
-      const thesis = thesisModel(
+    
+    await createThesis(
+      thesisModel(
         res.name, 
         res.url,
-        'kajsnd',
-        'route-1',
-        ['member 1', 'member 2', 'member 3'],
+        'studentId123', // replace with actual student ID
+        lastSegment,
         'akjsdnd'
+      )
     );
-      await createThesis(thesis);
     } catch (error) {
       console.error(error);
     }
