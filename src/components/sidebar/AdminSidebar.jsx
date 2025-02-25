@@ -1,22 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  LogOut,
-  LayoutDashboard,
-  BookOpen,
-  UserPlus,
-  FileText,
-  User,
-  Settings,
-  Menu,
-  X,
-} from 'lucide-react';
+import { LogOut, LayoutDashboard, BookOpen, UserPlus, FileText, User, Settings, Menu, X } from 'lucide-react';
 import SidebarSection from './SidebarSection';
+import { useAuthStore } from '../../stores/useAuthStore'; // Import Zustand store
+import { useRouter } from 'next/navigation'; // Use router for redirection
 
 const AdminSidebar = () => {
   const [activeSection, setActiveSection] = useState('Title Proposal');
   const [isOpen, setIsOpen] = useState(false);
+  const logoutUser = useAuthStore((state) => state.logoutUser);
+  const router = useRouter(); 
+
+  const handleLogout = async () => {
+    await logoutUser();
+    router.push('/auth/admin'); // Redirect to admin login page
+  };
 
   return (
     <>
@@ -111,7 +110,7 @@ const AdminSidebar = () => {
         {/* Logout Button */}
         <button
           className="m-3 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors duration-200 group"
-          onClick={() => setIsOpen(false)}
+          onClick={handleLogout} // Call handleLogout function
         >
           <div className="flex items-center justify-center space-x-2">
             <LogOut size={18} className="text-gray-300 group-hover:text-white" />
