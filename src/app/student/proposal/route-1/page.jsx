@@ -1,7 +1,7 @@
 'use client'
 
 import { FileUp } from 'lucide-react';
-import FileCard from '../../../../components/card/FileCard';
+import StudentFileCard from '../../../../components/card/StudentFileCard';
 import TRSButton from '../../../../components/button/TRSButton';
 import SubmitFile from '../../../../components/button/SubmitFile';
 
@@ -12,7 +12,7 @@ const Page = () => {
 				<SubmitFile/>
 			</div>
 			<div className='w-full flex justify-center md:justify-start'>
-				<FileCard/>
+				<StudentFileCard/>
 			</div>
 		</div>
 	);
