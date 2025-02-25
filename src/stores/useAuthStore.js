@@ -14,6 +14,7 @@ import {
 	where,
 	collection,
 	getDocs,
+	addDoc,
 } from 'firebase/firestore';
 import { app, auth, db } from '../server/firebase'; // Adjust to your Firebase config file
 
@@ -25,10 +26,22 @@ export const useAuthStore = create((set, get) => ({
 	isLoggedIn: false,
 	role: null,
 
+	getCurrentUser: async () => {
+		const auth = getAuth();
+		const currentUser = auth.currentUser
+
+		if (!currentUser) {
+			console.log('No user signed in');
+			return null			
+		}
+
+		return currentUser
+	},
+
 	// Register user using ID number
-	registerUser: async (idNumber, password, role, additionalData = {}) => {
+	registerUser: async (idNumber, password, role, userDetails) => {
 		try {
-			const generatedEmail = `${idNumber}@school.edu`; // Fake email format
+			const generatedEmail = `${idNumber}@smcc.edu.ph`; // Fake email format
 			const userCredential = await createUserWithEmailAndPassword(
 				auth,
 				generatedEmail,
@@ -36,13 +49,12 @@ export const useAuthStore = create((set, get) => ({
 			);
 			const user = userCredential.user;
 
-			// Store user details in Firestore
-			await setDoc(doc(db, 'users', idNumber), {
-				idNumber,
-				email: generatedEmail,
-				role,
-				...additionalData,
-			});
+			const userRef = doc(db, 'users', idNumber); 
+			
+			await Promise.all([
+			  setDoc(userRef, { email: generatedEmail, role }), 
+			  addDoc(collection(db, role), userDetails) 
+			]);
 
 			set({ user, isLoggedIn: true, role });
 		} catch (error) {
