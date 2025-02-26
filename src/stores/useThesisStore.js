@@ -64,6 +64,32 @@ export const useThesisStore = create((set) => ({
 		}
 	},
 
+	getThesisByStudentAndRoute: async (studentId) => {
+		try {
+			set({ loading: true });
+			
+			const route = useThesisStore.getState().getCurrentRoute(); 
+
+			const thesisRef = collection(db, 'thesisPaper');
+			const snapshot = await getDocs(query(thesisRef, 
+				where('currRoute', '==', route),
+				where('studentId', '==', studentId)
+			));
+
+			const theses = snapshot.docs.map((doc) => ({
+				id: doc.id,
+				...doc.data(),
+			}))
+			.sort((a, b) => b.createdAt - a.createdAt);
+
+			set({ theses, loading: false });
+
+			return theses;
+		} catch (error) {
+			console.error(error);
+		}
+	},
+
 	createThesis: async (thesis) => {
 		try {
 			set({ loading: true });
