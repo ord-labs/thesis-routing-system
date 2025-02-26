@@ -18,9 +18,6 @@ import {
 } from 'firebase/firestore';
 import { app, auth, db } from '../server/firebase'; // Adjust to your Firebase config file
 
-// const auth = getAuth(app);
-// const db = getFirestore(app);
-
 export const useAuthStore = create((set, get) => ({
 	user: null,
 	isLoggedIn: false,
@@ -85,10 +82,11 @@ export const useAuthStore = create((set, get) => ({
 			// Fetch user details from Firestore using ID number
 			const userQuery = query(
 				collection(db, 'users'),
-				where('idNumber', '==', idNumber)
+				where('email', '==', `${idNumber}@smcc.edu.ph`)
 			);
+	
 			const userSnapshot = await getDocs(userQuery);
-
+			
 			if (!userSnapshot.empty) {
 				const userData = userSnapshot.docs[0].data();
 				const generatedEmail = userData.email; // Get stored email
@@ -99,8 +97,11 @@ export const useAuthStore = create((set, get) => ({
 					generatedEmail,
 					password
 				);
-				const user = userCredential.user;
-
+				const userTypeQUery = query(collection(db, userData.role), where('userId', '==', idNumber));
+				const snapshot = await getDocs(userTypeQUery);
+				const doc = snapshot.docs[0]; 
+				const user = { id: doc.id, ...doc.data() };
+					
 				set({ user, isLoggedIn: true, role: userData.role });
 			} else {
 				console.error('Login Error: ID Number not found');
