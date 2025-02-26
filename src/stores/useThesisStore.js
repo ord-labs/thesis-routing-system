@@ -122,43 +122,4 @@ export const useThesisStore = create((set) => ({
 			return { success: false, error: error.message };
 		}
 	},
-
-	getThesisByStudentAndRoute: async (studentId) => {
-		try {
-			const q = query(
-				collection(db, 'thesis'),
-				where('student', '==', studentId)
-			);
-			const snapshot = await getDocs(q);
-			return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		} catch (error) {
-			console.error('Error fetching student thesis:', error);
-		}
-	},
-
-	getThesisByAdviser: async (adviserId) => {
-		try {
-			const q = query(
-				collection(db, 'thesis'),
-				where('adviser', '==', adviserId)
-			);
-			const snapshot = await getDocs(q);
-			return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		} catch (error) {
-			console.error('Error fetching adviser thesis:', error);
-		}
-	},
-
-	getThesisByPanel: async (panelId) => {
-		try {
-			const q = query(
-				collection(db, 'thesis'),
-				where('panels', 'array-contains', panelId)
-			);
-			const snapshot = await getDocs(q);
-			return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		} catch (error) {
-			console.error('Error fetching panel thesis:', error);
-		}
-	},
 }));
