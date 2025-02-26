@@ -3,6 +3,8 @@
 import { MessageSquare } from "lucide-react";
 import { useState } from "react";
 import Modal from "../modal/Modal";
+import { useThesisStore } from "../../stores/useThesisStore";
+import { commentModel } from "../../models/commentModel";
 
 const pdfUrl = "https://ik.imagekit.io/zzm6teifoe/Lab_4_-_ESP32_WiFi_and_Web_Servers_y4z-6sYTn.pdf";
 const thumbnailUrl = "https://ik.imagekit.io/zzm6teifoe/Lab_4_-_ESP32_WiFi_and_Web_Servers_y4z-6sYTn.pdf/ik-thumbnail.jpg";
@@ -15,15 +17,23 @@ const PanelAdFileCard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [comment, setComment] = useState("");
 
+    const createThesisComment = useThesisStore((state) => state.createThesisComment);
+    
     // Group/Project info {Placeholder}
     const groupNumber = "Group 1";
     const projectTitle = "Lab 4 - ESP32 WiFi and Web Servers";
     const submittedOn = " 2025-03-01";
 
-    const handleCommentSubmit = (e) => {
+    const handleCommentSubmit = async (e) => {
         e.preventDefault();
-        // Comment posting logic here
-        console.log("Submitted comment:", comment);
+        await createThesisComment(
+            commentModel(
+                'paperId', // placeholder
+                'panelId', // placeholder
+                'adviserId', // placeholder
+                comment
+            )
+        )
         setComment("");
         setIsModalOpen(false);
     };
