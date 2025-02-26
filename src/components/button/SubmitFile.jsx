@@ -28,6 +28,8 @@ const authenticator = async () => {
 
 const SubmitFile = () => {
   const createThesis = useThesisStore((state) => state.createThesis);
+  const route = useThesisStore((state) => state.getCurrentRoute());
+  const getAllThesis = useThesisStore((state) => state.getAllThesis);
   
   const onError = (err) => {
     console.log("Error", err);
@@ -36,19 +38,18 @@ const SubmitFile = () => {
   const onSuccess = async (res) => {
     console.log("Success", res);
 
-    const pathnameParts = window.location.pathname.split('/').filter(Boolean);
-    const lastSegment = pathnameParts[pathnameParts.length - 1];
     try {
-    
-    await createThesis(
-      thesisModel(
-        res.name, 
-        res.url,
-        'studentId123', // replace with actual student ID
-        lastSegment,
-        'akjsdnd'
-      )
-    );
+      await createThesis(
+        thesisModel(
+          res.name, 
+          res.url,
+          'studentId123', // replace with actual student ID
+          ['panelId1', 'panelId2'], // replace with actual panel IDs
+          'adviserId123', // replace with actual adviser ID
+          route,
+        )
+      );
+
     } catch (error) {
       console.error(error);
     }

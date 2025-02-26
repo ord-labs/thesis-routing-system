@@ -24,27 +24,39 @@ import {
 	where,
 	addDoc,
 } from 'firebase/firestore';
-import { app } from '..//server/firebase' 
+import { app, db } from '../server/firebase' 
 import { studentModel } from '../models/studentModel';
 import { panelModel } from '../models/panelModel';
 import { adviserModel } from '../models/adviserModel';
-
-const db = getFirestore(app);
 
 export const useThesisStore = create((set) => ({
 	theses: [],
 	loading: false,
 
+	getCurrentRoute: () => {
+		if (typeof window !== "undefined") {  // ✅ Prevents errors during SSR
+            const pathnameParts = window.location.pathname.split("/").filter(Boolean);
+            return pathnameParts[pathnameParts.length - 1];
+        }
+		return null
+    },
+
 	getAllThesis: async () => {
-		set({ loading: true });
 		try {
-			const thesisRef = collection(db, 'thesis');
-			const snapshot = await getDocs(thesisRef);
+			set({ loading: true });
+
+			const route = useThesisStore.getState().getCurrentRoute(); 
+			
+			const thesisRef = collection(db, 'thesisPaper');
+			const snapshot = await getDocs(query(thesisRef, where('currRoute', '==', route)));
 			const theses = snapshot.docs.map((doc) => ({
 				id: doc.id,
 				...doc.data(),
-			}));
+			}))
+			.sort((a, b) => b.createdAt - a.createdAt); 
+
 			set({ theses, loading: false });
+			
 			return theses;
 		} catch (error) {
 			console.error('Error fetching theses:', error);
@@ -54,7 +66,15 @@ export const useThesisStore = create((set) => ({
 
 	createThesis: async (thesis) => {
 		try {
+			set({ loading: true });
 			const thesisRef = await addDoc(collection(db, 'thesisPaper'), thesis);
+			set((state) => ({
+				theses: [
+					{ id: thesisRef.id, ...thesis }, 
+					...state.theses
+				],
+				loading: false,
+			}));
 			return { success: true };
 		} catch (error) {
 			console.error('Error creating thesis:', error);
@@ -103,7 +123,7 @@ export const useThesisStore = create((set) => ({
 		}
 	},
 
-	getThesisByStudent: async (studentId) => {
+	getThesisByStudentAndRoute: async (studentId) => {
 		try {
 			const q = query(
 				collection(db, 'thesis'),
