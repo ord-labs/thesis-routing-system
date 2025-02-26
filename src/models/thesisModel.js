@@ -1,9 +1,10 @@
-export const thesisModel = (title, fileUrl, studentId, currRoute, members, deadline) => ({
+export const thesisModel = (title, fileUrl, studentId, panelIds, adviserId, currRoute) => ({
     title,
     fileUrl,
     studentId,
+    panelIds,
+    adviserId,
     currRoute,
-    members,
-    deadline,
+    // deadline,
     createdAt: new Date()
 });

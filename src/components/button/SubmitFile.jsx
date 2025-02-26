@@ -28,6 +28,8 @@ const authenticator = async () => {
 
 const SubmitFile = () => {
   const createThesis = useThesisStore((state) => state.createThesis);
+  const route = useThesisStore((state) => state.getCurrentRoute());
+  const getAllThesis = useThesisStore((state) => state.getAllThesis);
   
   const onError = (err) => {
     console.log("Error", err);
@@ -37,16 +39,17 @@ const SubmitFile = () => {
     console.log("Success", res);
 
     try {
-      // placeholder for testing
-      const thesis = thesisModel(
-        res.name, 
-        res.url,
-        'kajsnd',
-        'route-1',
-        ['member 1', 'member 2', 'member 3'],
-        'akjsdnd'
-    );
-      await createThesis(thesis);
+      await createThesis(
+        thesisModel(
+          res.name, 
+          res.url,
+          'studentId123', // replace with actual student ID
+          ['panelId1', 'panelId2'], // replace with actual panel IDs
+          'adviserId123', // replace with actual adviser ID
+          route,
+        )
+      );
+
     } catch (error) {
       console.error(error);
     }
