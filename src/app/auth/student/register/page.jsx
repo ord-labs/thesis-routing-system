@@ -86,7 +86,8 @@ const Page = () => {
 				selectedOption,
 				selectedCollege,
 				selectedAdviser,
-				selectedGroupNumber
+				selectedGroupNumber,
+				[member1, member2, member3]
 			)
 		)
 

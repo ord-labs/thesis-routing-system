@@ -1,4 +1,4 @@
-export const studentModel = (userId, name, schoolYear, course, college, adviser, groupNumber) => ({
+export const studentModel = (userId, name, schoolYear, course, college, adviser, groupNumber, members) => ({
     userId, 
     name, 
     schoolYear, 
@@ -6,4 +6,5 @@ export const studentModel = (userId, name, schoolYear, course, college, adviser,
     college, 
     adviser, 
     groupNumber,
+    members
 })

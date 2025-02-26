@@ -82,44 +82,11 @@ export const useThesisStore = create((set) => ({
 		}
 	},
 
-	createThesisComment: async (id, newComment) => {
+	createThesisComment: async (comment) => {
 		try {
-			const thesisRef = doc(db, 'thesis', id);
-			const thesisSnap = await getDoc(thesisRef);
-
-			if (!thesisSnap.exists()) {
-				return { success: false, error: 'Thesis not found' };
-			}
-
-			const thesisData = thesisSnap.data();
-			const { comments = [], panels, adviser, current_route } = thesisData;
-
-			// Ensure the new comment includes the user role
-			const updatedComments = [...comments, newComment];
-
-			// Get unique users who have commented (panels & adviser)
-			const commenters = new Set(updatedComments.map((c) => c.userId));
-
-			// Check if all panels and adviser have commented
-			const allPanelsCommented = panels.every((panelId) =>
-				commenters.has(panelId)
-			);
-			const adviserCommented = commenters.has(adviser);
-
-			let nextRoute = current_route;
-			if (allPanelsCommented && adviserCommented && current_route < 3) {
-				nextRoute += 1; // Move to next route
-			}
-
-			await updateDoc(thesisRef, {
-				comments: updatedComments,
-				current_route: nextRoute,
-			});
-
-			return { success: true, nextRoute };
+			await addDoc(collection(db, 'comments'), comment)
 		} catch (error) {
-			console.error('Error adding thesis comment:', error);
-			return { success: false, error: error.message };
-		}
+			console.error(error);
+		}	
 	},
 }));
