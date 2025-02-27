@@ -1,22 +1,62 @@
 'use client';
 
-import { useState } from 'react';
-import {
-  LogOut,
-  LayoutDashboard,
-  BookOpen,
-  UserPlus,
-  FileText,
-  User,
-  Settings,
-  Menu,
-  X,
-} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { LogOut, FileText, BookOpen, UserPlus, User, Menu, X } from 'lucide-react';
 import SidebarSection from './SidebarSection';
+import { useAuthStore } from '../../stores/useAuthStore';
+import { useRouter } from 'next/navigation';
+
+const sidebarSections = [
+  {
+    icon: FileText,
+    title: "Title Proposal",
+    links: [
+      { name: "Route 1", href: "/admin/proposal/route-1" },
+      { name: "Route 2", href: "/admin/proposal/route-2" },
+      { name: "Route 3", href: "/admin/proposal/route-3" },
+      { name: "Indorsement Form", href: "/admin/proposal/endorsement" },
+    ],
+  },
+  {
+    icon: BookOpen,
+    title: "Final",
+    links: [
+      { name: "Route 1", href: "/admin/final/route-1" },
+      { name: "Route 2", href: "/admin/final/route-2" },
+      { name: "Route 3", href: "/admin/final/route-3" },
+    ],
+  },
+  {
+    icon: UserPlus,
+    title: "Register Account",
+    links: [
+      { name: "Adviser", href: "/admin/register/adviser" },
+      { name: "Panel", href: "/admin/register/panel" },
+    ],
+  },
+];
 
 const AdminSidebar = () => {
   const [activeSection, setActiveSection] = useState('Title Proposal');
   const [isOpen, setIsOpen] = useState(false);
+  const logoutUser = useAuthStore((state) => state.logoutUser);
+  const router = useRouter(); 
+
+  useEffect(() => {
+    const storedSection = localStorage.getItem("activeSection");
+    if (storedSection) setActiveSection(storedSection);
+  }, []);
+
+  const handleLogout = async () => {
+    await logoutUser();
+    router.push('/auth/admin');
+  };
+
+  const handleSectionChange = (title) => {
+    setActiveSection(title);
+    localStorage.setItem("activeSection", title);
+    setIsOpen(false); // Close sidebar on mobile after selection
+  };
 
   return (
     <>
@@ -24,16 +64,14 @@ const AdminSidebar = () => {
       <button
         className="md:hidden fixed left-4 top-4 z-50 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label="Toggle Sidebar"
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
       {/* Backdrop for mobile */}
       {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 md:hidden z-40"
-          onClick={() => setIsOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/50 md:hidden z-40" onClick={() => setIsOpen(false)} />
       )}
 
       {/* Sidebar */}
@@ -57,61 +95,23 @@ const AdminSidebar = () => {
 
         {/* Navigation Sections */}
         <nav className="flex-1 p-3 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
-          <SidebarSection
-            icon={FileText}
-            title="Title Proposal"
-            active={activeSection}
-            setActiveSection={setActiveSection}
-            links={[
-              { name: 'route 1', href: '/admin/proposal/route-1' },
-              { name: 'route 2', href: '/admin/proposal/route-2' },
-              { name: 'route 3', href: '/admin/proposal/route-3' },
-              { name: 'Indorsement Form', href: '/admin/proposal/endorsement' },
-            ]}
-            onLinkClick={() => setIsOpen(false)}
-          />
-
-          <SidebarSection
-            icon={BookOpen}
-            title="Final"
-            active={activeSection}
-            setActiveSection={setActiveSection}
-            links={[
-              { name: 'route 1', href: '/admin/final/route-1' },
-              { name: 'route 2', href: '/admin/final/route-2' },
-              { name: 'route 3', href: '/admin/final/route-3' },
-            ]}
-            onLinkClick={() => setIsOpen(false)}
-          />
-
-          <SidebarSection
-            icon={UserPlus}
-            title="Register Account"
-            active={activeSection}
-            setActiveSection={setActiveSection}
-            links={[
-              { name: 'adviser', href: '/admin/register/adviser' },
-              { name: 'panel', href: '/admin/register/panel' },
-            ]}
-            onLinkClick={() => setIsOpen(false)}
-          />
-
-          <div className="mt-4 pt-4 border-t border-gray-700">
-            <a
-              href="#"
-              className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200"
-              onClick={() => setIsOpen(false)}
-            >
-              <Settings size={18} />
-              <span>Settings</span>
-            </a>
-          </div>
+          {sidebarSections.map((section) => (
+            <SidebarSection
+              key={section.title}
+              icon={section.icon}
+              title={section.title}
+              active={activeSection}
+              setActiveSection={handleSectionChange}
+              links={section.links}
+            />
+          ))}
         </nav>
 
         {/* Logout Button */}
         <button
+          type="button"
           className="m-3 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors duration-200 group"
-          onClick={() => setIsOpen(false)}
+          onClick={handleLogout}
         >
           <div className="flex items-center justify-center space-x-2">
             <LogOut size={18} className="text-gray-300 group-hover:text-white" />
