@@ -30,8 +30,8 @@ const Page = () => {
             ) : (
                 <div className="w-full flex flex-wrap gap-20 justify-center md:justify-start">
                     {theses.length > 0 ? (
-                        theses.map((thesis) => (
-                            <StudentFileCard key={thesis.id} pdfUrl={thesis.fileUrl} />
+                        theses.map((thesis, index) => (
+                            <StudentFileCard key={index} paperId={thesis.id} pdfUrl={thesis.fileUrl} />
                         ))
                     ) : (
                         <p className="text-gray-500 text-center">No thesis papers found.</p>
