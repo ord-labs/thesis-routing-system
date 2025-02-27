@@ -20,7 +20,8 @@ const Page = () => {
 		e.preventDefault();
 		loginUser(idnumber, password)
 
-		localStorage.setItem('user', JSON.stringify({ userId: user.id, role }));
+		localStorage.setItem('studentId', user.id);
+		localStorage.setItem('role', role);
 
 		router.push('/student/proposal/route-1')
 	};
