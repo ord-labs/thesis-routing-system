@@ -59,7 +59,7 @@ export const useThesisStore = create((set) => ({
 			
 			return theses;
 		} catch (error) {
-			console.error('Error fetching theses:', error);
+			
 			set({ loading: false });
 		}
 	},
@@ -86,7 +86,7 @@ export const useThesisStore = create((set) => ({
 
 			return theses;
 		} catch (error) {
-			console.error(error);
+			
 		}
 	},
 
@@ -103,51 +103,98 @@ export const useThesisStore = create((set) => ({
 			}));
 			return { success: true };
 		} catch (error) {
-			console.error('Error creating thesis:', error);
+			
 			return { success: false, error: error.message };
 		}
 	},
 
-	createThesisComment: async (comment) => {
+	createThesisComment: async (comment, role, docId, paperId) => {
 		try {
-			await addDoc(collection(db, 'comments'), comment)
+
+			let updateData = {};
+
+			const commentRef = collection(db, role, docId, 'comments');
+			const paperRef = doc(db, 'thesisPaper', paperId)
+			
+			if (role === "adviser") {
+				updateData["adviserId"] = docId;
+			} else {
+				const panelRef = doc(db, 'panel', docId)
+				const docSnap = await getDoc(panelRef);
+				const label = docSnap.data().position.label
+				const panelNum = label.split(' ')[1]
+
+				updateData[`panelIds.${panelNum-1}`] = docId; 
+			}
+			
+			await updateDoc(paperRef, updateData);
+			await addDoc(commentRef, comment )
 		} catch (error) {
-			console.error(error);
+			
+			
 		}	
 	},
 
 	getThesisComment: async (paperId) => {
 		try {
-			let panels = [];
-			const panelSnapshot = await getDocs(collection(db, "panel"));
+			const adviserCollection = collection(db, "adviser");
+			const panelCollection = collection(db, "panel");
 	
-			await Promise.all(panelSnapshot.docs.map(async (panelDoc) => { 
+			const adviserSnapshot = await getDocs(adviserCollection);
+			const panelSnapshot = await getDocs(panelCollection);
+	
+			let matchingPanels = [];
+			let matchingAdvisers = [];
+	
+			await Promise.all(panelSnapshot.docs.map(async (panelDoc) => {
 				const panelId = panelDoc.id;
-				const panelLabel = panelDoc.data().position.label;
-				const q = query(collection(db, "comments"), 
-					where("paperId", "==", paperId), 
-					where("panelId", "==", panelId)
-				);
-				const snapshot = await getDocs(q);
-				
+				const commentsRef = collection(db, "panel", panelId, "comments");
+				const q = query(commentsRef, where("paperId", "==", paperId));
+				const commentsSnapshot = await getDocs(q);
 	
-				if (!snapshot.empty) {
-					snapshot.docs.forEach((doc) => {
-						panels.push({ id: doc.id, panelName: panelDoc.data().name, panelLabel: panelLabel,  ...doc.data() });
+				if (!commentsSnapshot.empty) {
+					const firstCommentDoc = commentsSnapshot.docs[0];
+					matchingPanels.push({ 
+						id: panelId, 
+						...panelDoc.data(), 
+						comment: firstCommentDoc.data().comment 
 					});
 				}
 			}));
-
-			panels.sort((a, b) => {
-				const numA = parseInt(a.panelLabel.replace(/\D/g, ""), 10); 
-				const numB = parseInt(b.panelLabel.replace(/\D/g, ""), 10);
-				return numA - numB; 
-			});
 	
-			return panels;
+			// Loop through each adviser to check its 'comments' subcollection
+			await Promise.all(adviserSnapshot.docs.map(async (adviserDoc) => {
+				const adviserId = adviserDoc.id;
+				const commentsRef = collection(db, "adviser", adviserId, "comments");
+				const q = query(commentsRef, where("paperId", "==", paperId));
+				const commentsSnapshot = await getDocs(q);
+	
+
+
+				if (!commentsSnapshot.empty) {
+					const firstCommentDoc = commentsSnapshot.docs[0]; 
+					matchingAdvisers.push({ 
+						id: adviserId, 
+						...adviserDoc.data(), 
+						comment: firstCommentDoc.data().comment 
+					});
+				}
+				
+			}));
+			
+			const sortedPanel = matchingPanels.sort((a, b) => {
+				const numA = parseInt(a.position.label.replace(/\D/g, ""), 10);
+				const numB = parseInt(b.position.label.replace(/\D/g, ""), 10);
+				return numA - numB;
+			});
+			
+			const allComments = [...sortedPanel, ...matchingAdvisers];
+			console.log(allComments);
+			return allComments;
+	
 		} catch (error) {
-			console.error(error);
-			return []; 
+			console.error("Error fetching comments:", error);
+			return [];
 		}
-	},
+	}
 }));

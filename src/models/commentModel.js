@@ -1,6 +1,4 @@
-export const commentModel = (paperId, panelId, adviserId, comment ) => ({
+export const commentModel = (paperId, comment ) => ({
     paperId,
-    panelId,
-    adviserId,
     comment
 })
