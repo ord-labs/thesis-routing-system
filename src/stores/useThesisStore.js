@@ -115,4 +115,39 @@ export const useThesisStore = create((set) => ({
 			console.error(error);
 		}	
 	},
+
+	getThesisComment: async (paperId) => {
+		try {
+			let panels = [];
+			const panelSnapshot = await getDocs(collection(db, "panel"));
+	
+			await Promise.all(panelSnapshot.docs.map(async (panelDoc) => { 
+				const panelId = panelDoc.id;
+				const panelLabel = panelDoc.data().position.label;
+				const q = query(collection(db, "comments"), 
+					where("paperId", "==", paperId), 
+					where("panelId", "==", panelId)
+				);
+				const snapshot = await getDocs(q);
+				
+	
+				if (!snapshot.empty) {
+					snapshot.docs.forEach((doc) => {
+						panels.push({ id: doc.id, panelName: panelDoc.data().name, panelLabel: panelLabel,  ...doc.data() });
+					});
+				}
+			}));
+
+			panels.sort((a, b) => {
+				const numA = parseInt(a.panelLabel.replace(/\D/g, ""), 10); 
+				const numB = parseInt(b.panelLabel.replace(/\D/g, ""), 10);
+				return numA - numB; 
+			});
+	
+			return panels;
+		} catch (error) {
+			console.error(error);
+			return []; 
+		}
+	},
 }));
