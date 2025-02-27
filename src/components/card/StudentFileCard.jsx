@@ -15,7 +15,7 @@ const StudentFileCard = ({ pdfUrl }) => {
         return url.substring(url.lastIndexOf('/') + 1);
     };
     return (
-        <div className="w-[90%] md:w-80 flex flex-col items-center  border shadow-md  rounded-lg ">
+        <div className="w-[90%] bg-white md:w-80 flex flex-col items-center  border shadow-md  rounded-lg ">
           
           <div className="w-full flex justify-end px-2 py-2 bg-gray-700 rounded-t-lg ">
             <Ellipsis size={30} className="text-white cursor-pointer" onClick={e => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen)} }/>

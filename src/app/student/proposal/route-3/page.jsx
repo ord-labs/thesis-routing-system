@@ -8,13 +8,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { useThesisStore } from '../../../../stores/useThesisStore';
 
 const Page = () => {
-	const theses = useThesisStore((state) => state.theses);
-	const loading = useThesisStore((state) => state.loading);
-	const getAllThesis = useThesisStore((state) => state.getAllThesis);
-
-	const getThesisPapers = useCallback(async () => {
-		await getAllThesis();
-    }, [getAllThesis]);
+    const { theses, loading, getThesisByStudentAndRoute } = useThesisStore((state) => state);
+	
+    const getThesisPapers = useCallback(async () => {
+		await getThesisByStudentAndRoute('studentId123')
+    }, [getThesisByStudentAndRoute]);
 
     useEffect(() => {
         getThesisPapers();
