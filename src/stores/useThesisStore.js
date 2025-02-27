@@ -127,11 +127,21 @@ export const useThesisStore = create((set) => ({
 				updateData[`panelIds.${panelNum-1}`] = docId; 
 			}
 			
+			const q = query(commentRef, where("paperId", "==", paperId)); 
+			const querySnapshot = await getDocs(q);
+	
+			if (!querySnapshot.empty) {
+				querySnapshot.forEach(async (docSnap) => {
+					const existingCommentRef = doc(db, role, docId, 'comments', docSnap.id);
+					await updateDoc(existingCommentRef, comment);
+				});
+			} else {
+				await addDoc(commentRef, comment);
+			}
+	
 			await updateDoc(paperRef, updateData);
-			await addDoc(commentRef, comment )
 		} catch (error) {
-			
-			
+			console.error(error);
 		}	
 	},
 
@@ -187,7 +197,7 @@ export const useThesisStore = create((set) => ({
 				const numB = parseInt(b.position.label.replace(/\D/g, ""), 10);
 				return numA - numB;
 			});
-			
+
 			const allComments = [...sortedPanel, ...matchingAdvisers];
 			console.log(allComments);
 			return allComments;
