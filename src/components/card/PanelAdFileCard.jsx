@@ -7,7 +7,7 @@ import { useThesisStore } from "../../stores/useThesisStore";
 import { commentModel } from "../../models/commentModel";
 import { IKImage } from "imagekitio-next";
 
-const PanelAdFileCard = ({ pdfUrl }) => {
+const PanelAdFileCard = ({ pdfUrl, paperId }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [comment, setComment] = useState("");
 
@@ -55,12 +55,9 @@ const PanelAdFileCard = ({ pdfUrl }) => {
         e.preventDefault();
         await createThesisComment(
             commentModel(
-                'paperId', // placeholder
-                'panelId', // placeholder
-                'adviserId', // placeholder
+                paperId,
                 comment
-            )
-        )
+            ), 'panel', localStorage.getItem('panelId'), paperId)
         setComment("");
         setIsModalOpen(false);
     };

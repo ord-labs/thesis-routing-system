@@ -23,11 +23,11 @@ const StudentFileCard = ({ pdfUrl, paperId }) => {
 
     const toggleMenu = async () => {   
         try {  
-            const fetchedComments = await getThesisComment(paperId); 
+            const fetchedComments = await getThesisComment(paperId ); 
             
             setComments(Array.isArray(fetchedComments) ? fetchedComments : []);  
         } catch (error) {  
-            console.error("Error fetching comments:", error);  
+            console.error("Error fetching comments:",    error);  
             setComments([]);  
         } finally {  
             setIsMenuOpen(true);  
@@ -71,7 +71,7 @@ const StudentFileCard = ({ pdfUrl, paperId }) => {
                                         className="cursor-pointer" 
                                         onClick={() => toggleComment(index)} 
                                     />
-                                    <p>{comment.panelName}</p>
+                                    <p>{comment.name}</p>
                                 </div>
                                 <span className="flex gap-2 items-center">
                                     <CircleCheck size={20} /> Approved
