@@ -103,6 +103,7 @@ export const useAuthStore = create((set, get) => ({
 				const user = { id: doc.id, ...doc.data() };
 					
 				set({ user, isLoggedIn: true, role: userData.role });
+				return user
 			} else {
 				console.error('Login Error: ID Number not found');
 			}
@@ -143,12 +144,12 @@ export const useAuthStore = create((set, get) => ({
 	// 	await useAuthStore.getState().loginAdmin(email, password);
 	// },
 	loginStudent: async (idNumber, password) => {
-		await useAuthStore.getState().loginUser(idNumber, password);
+		return await useAuthStore.getState().loginUser(idNumber, password);
 	},
 	loginPanel: async (idNumber, password) => {
-		await useAuthStore.getState().loginUser(idNumber, password);
+		return await useAuthStore.getState().loginUser(idNumber, password);
 	},
 	loginAdviser: async (idNumber, password) => {
-		await useAuthStore.getState().loginUser(idNumber, password);
+		return await useAuthStore.getState().loginUser(idNumber, password);
 	},
 }));
