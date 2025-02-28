@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LogOut,
   LayoutDashboard,
@@ -13,10 +13,31 @@ import {
   X,
 } from "lucide-react";
 import SidebarSection from "./SidebarSection";
+import { useSidebarStore } from "../../stores/useSidebarStore";
 
 const AdviserSidebar = () => {
   const [activeSection, setActiveSection] = useState("Title Proposal");
   const [isOpen, setIsOpen] = useState(false);
+  const [userDetails, setUserDetails] = useState({
+      name: "",
+      role: ""
+  })
+  
+    const { getUserDetails } = useSidebarStore((state) => state);
+  
+    useEffect(() => {
+      const getUser = async () => {
+        const role = localStorage.getItem('role');
+        const adviserId = localStorage.getItem('adviserId')
+  
+        const currentUser = await getUserDetails(role, adviserId);
+        setUserDetails({
+          name: currentUser.name,
+          role: role
+        })
+      }
+      getUser()
+    }, [])
 
   return (
     <>
@@ -49,8 +70,8 @@ const AdviserSidebar = () => {
               <User size={20} className="text-white" />
             </div>
             <div>
-              <p className="text-sm font-medium text-white">El Jay</p>
-              <p className="text-xs text-gray-400">Adviser</p>
+              <p className="text-sm font-medium text-white">{userDetails.name}</p>
+              <p className="text-xs text-gray-400">{userDetails.role}</p>
             </div>
           </div>
         </div>

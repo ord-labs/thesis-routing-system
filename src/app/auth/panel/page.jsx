@@ -14,15 +14,16 @@ const Page = () => {
 	const [idnumber, setIdnumber] = useState('');
 	const [password, setPassword] = useState('');
 
-	const { role, loginUser } = useAuthStore((state) => state)
+	const { loginPanel } = useAuthStore((state) => state)
 
 	const handleLogin = async (e) => {
 		e.preventDefault();
 		
-		const user = await loginUser(idnumber, password)
+		const user = await loginPanel(idnumber, password)
+		console.log(user);
 		
 		localStorage.setItem('panelId', user.id);
-		localStorage.setItem('role', role);
+		localStorage.setItem('role', 'panel');
 
 		router.push('/panel/proposal/route-1')
 	};

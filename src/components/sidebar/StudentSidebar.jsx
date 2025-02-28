@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LogOut,
   LayoutDashboard,
@@ -13,10 +13,31 @@ import {
   X,
 } from "lucide-react";
 import SidebarSection from "./SidebarSection";
+import { useSidebarStore } from "../../stores/useSidebarStore";
 
 const StudentSidebar = () => {
   const [activeSection, setActiveSection] = useState("Title Proposal");
   const [isOpen, setIsOpen] = useState(false);
+  const [userDetails, setUserDetails] = useState({
+    name: "",
+    role: ""
+  })
+
+  const { getUserDetails } = useSidebarStore((state) => state);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const role = localStorage.getItem('role');
+      const studentId = localStorage.getItem('studentId')
+
+      const currentUser = await getUserDetails(role, studentId);
+      setUserDetails({
+        name: currentUser.name,
+        role: role
+      })
+    }
+    getUser()
+  }, [])
 
   return (
     <>
@@ -25,6 +46,7 @@ const StudentSidebar = () => {
         className="md:hidden fixed left-6 top-8 z-50 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white"
         onClick={() => setIsOpen(!isOpen)}
       >
+      
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
@@ -49,8 +71,8 @@ const StudentSidebar = () => {
               <User size={20} className="text-white" />
             </div>
             <div>
-              <p className="text-sm font-medium text-white">El Jay</p>
-              <p className="text-xs text-gray-400">Student</p>
+              <p className="text-sm font-medium text-white">{userDetails.name}</p>
+              <p className="text-xs text-gray-400">{userDetails.role}</p>
             </div>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { FormInput } from 'lucide-react';
 import TRSInput from '../../../components/input/TRSInput';
+import { useAuthStore } from '../../../stores/useAuthStore';
 
 const Page = () => {
 	const router = useRouter();
@@ -13,9 +14,19 @@ const Page = () => {
 	const [idnumber, setIdnumber] = useState('');
 	const [password, setPassword] = useState('');
 
-	useEffect(() => {
-		console.log(idnumber, password);
-	}, [idnumber, password]);
+
+	const { loginAdviser } = useAuthStore((state) => state)
+
+	const handleLogin = async (e) => {
+		e.preventDefault();
+		
+		const user = await loginAdviser(idnumber, password)
+		
+		localStorage.setItem('adviserId', user.id);
+		localStorage.setItem('role', 'adviser');
+
+		router.push('/adviser/proposal/route-1')
+	};
 
 	return (
 		<div className="flex flex-col justify-center gap-y-8 bg-smccprimary  w-full h-screen">
@@ -55,7 +66,7 @@ const Page = () => {
 					onChange={(e) => setPassword(e.target.value)}
 					type="password"
 				/>
-				<TRSButton label={'Login'} onClick={() => {}} />
+				<TRSButton label={'Login'} onClick={handleLogin} />
 			</div>
 		</div>
 	);

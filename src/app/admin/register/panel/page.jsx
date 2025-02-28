@@ -8,6 +8,7 @@ import TRSInput from '../../../../components/input/TRSInput';
 import Link from 'next/link';
 import TRSDropdown from '../../../../components/input/TRSDropdown';
 import { useAuthStore } from '../../../../stores/useAuthStore';
+import { panelModel } from '../../../../models/panelModel';
 
 const Page = () => {
 	const router = useRouter();
@@ -19,8 +20,7 @@ const Page = () => {
 	const [department, setDepartment] = useState('');
 	const [position, setPosition] = useState('');
 
-	const registerUser = useAuthStore((state) => state.registerUser);
-
+	const { registerPanel } = useAuthStore((state) => state);
 	const departmentOptions = [
 		{ value: 'CTHM', label: 'College of Tourism, Hospitality, Business, and Management' },
 		{ value: 'CTE', label: 'College of Teacher Education' },
@@ -37,13 +37,15 @@ const Page = () => {
 	];
 
 	const handleRegister = async () => {
-		await registerUser(idnumber, password, 'panel', {
-			idnumber,
-			name,
-			department,
-			position,
-		});
-		router.push('/admin');
+		await registerPanel(idnumber, password, 
+			panelModel(
+				idnumber,
+				name,
+				department,
+				position,
+			)
+		);
+		router.push('/admin/proposal/route-1');
 	};
 
 	return (

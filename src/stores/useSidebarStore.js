@@ -7,12 +7,11 @@ export const useSidebarStore = create((set, get) => ({
         try {
             const userRef = doc(db, role, userId);
             const userSnapshot = await getDoc(userRef);
-            
-            set({ user: userSnapshot.data(), role: role });
-            return userSnapshot.data()
+            const userData = userSnapshot.data()
+            return userData
         } catch (error) {
             console.error(error);
-            return null
+            return 'error'
         }
    },    
 }));

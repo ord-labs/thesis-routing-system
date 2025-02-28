@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LogOut,
   LayoutDashboard,
@@ -13,10 +13,35 @@ import {
   X,
 } from "lucide-react";
 import SidebarSection from "./SidebarSection";
+import { useSidebarStore } from "../../stores/useSidebarStore";
 
 const PanelSidebar = () => {
   const [activeSection, setActiveSection] = useState("Title Proposal");
   const [isOpen, setIsOpen] = useState(false);
+  const [userDetails, setUserDetails] = useState({
+      name: "",
+      role: ""
+  })
+  
+    const { getUserDetails } = useSidebarStore((state) => state);
+  
+    useEffect(() => {
+      const getUser = async () => {
+        const role = localStorage.getItem('role');
+        const panelId = localStorage.getItem('panelId')
+        console.log(role, panelId);
+        
+        const currentUser = await getUserDetails(role, panelId);
+        console.log('currentusername: ', currentUser);
+        
+        setUserDetails({
+          name: currentUser.name,
+          role: role
+        })
+      }
+      getUser()
+    }, [])
+
 
   return (
     <>
