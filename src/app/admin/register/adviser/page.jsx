@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import TRSInput from '../../../../components/input/TRSInput';
 import TRSDropdown from '../../../../components/input/TRSDropdown';
 import { useAuthStore } from '../../../../stores/useAuthStore';
+import { adviserModel } from '../../../../models/adviserModel';
 
 const Page = () => {
 	const router = useRouter();
@@ -15,7 +16,7 @@ const Page = () => {
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [department, setDepartment] = useState('');
 
-	const registerUser = useAuthStore((state) => state.registerUser);
+	const { registerAdviser } = useAuthStore((state) => state);
 
 	const departmentOptions = [
 		{ value: 'CTHM', label: 'College of Tourism, Hospitality, Business, and Management' },
@@ -26,12 +27,14 @@ const Page = () => {
 	];
 
 	const handleRegister = async () => {
-		await registerUser(idnumber, password, 'adviser', {
-			idnumber,
-			name,
-			department,
-		});
-		router.push('/admin');
+		await registerAdviser(idnumber, password, 
+			adviserModel(
+				idnumber,
+				name,
+				department,
+			)
+		);
+		router.push('/admin/proposal/route-1');
 	};
 
 	return (

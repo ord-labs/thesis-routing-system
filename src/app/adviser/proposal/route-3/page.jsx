@@ -17,6 +17,7 @@ const Page = () => {
         getThesisPapers();
     }, [getThesisPapers]); 
 
+
 	return (
 		<div className='  flex flex-col justify-center md:items-start'>
 			{loading ? (
@@ -27,7 +28,7 @@ const Page = () => {
 				<div className='w-full flex flex-wrap gap-20 justify-center md:justify-start'>
 					{theses.length > 0 ? (
 						theses.map((thesis) => (
-							<PanelAdFileCard key={thesis.id} pdfUrl={thesis.fileUrl} />
+							<PanelAdFileCard key={thesis.id} paperId={thesis.id} pdfUrl={thesis.fileUrl} />
 						))
 					) : (
 						<p className="text-gray-500 text-center">No thesis papers found.</p>
