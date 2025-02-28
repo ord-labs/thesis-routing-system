@@ -1,6 +1,6 @@
 'use client'
 
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, FileText } from "lucide-react";
 import { useState } from "react";
 import Modal from "../modal/Modal";
 import { useThesisStore } from "../../stores/useThesisStore";
@@ -8,11 +8,18 @@ import { commentModel } from "../../models/commentModel";
 import { IKImage } from "imagekitio-next";
 
 const PanelAdFileCard = ({ pdfUrl, paperId }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
+    const [selectedComment, setSelectedComment] = useState(null);
     const [comment, setComment] = useState("");
+    const [allComments, setAllComments] = useState([]);
+    const [isLoadingComments, setIsLoadingComments] = useState(false);
 
     const thumbnailUrl = `${pdfUrl}/ik-thumbnail.jpg`;
     
+    const handleOpenFullComment = (commentItem) => {
+        setSelectedComment(commentItem);
+    };
+
     const getFilenameFromUrl = (url) => {
         return url.substring(url.lastIndexOf('/') + 1);
     };
@@ -50,30 +57,77 @@ const PanelAdFileCard = ({ pdfUrl, paperId }) => {
     const { groupNumber, projectTitle, submittedOn } = extractInfoFromFilename(filename);
 
     const createThesisComment = useThesisStore((state) => state.createThesisComment);
-    
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
+
     const handleCommentSubmit = async (e) => {
         e.preventDefault();
-        await createThesisComment(
-            commentModel(
-                paperId,
-                comment
-            ), 'panel', localStorage.getItem('panelId'), paperId)
-        setComment("");
-        setIsModalOpen(false);
+        setIsSubmitting(true);
+        try {
+            const result = await createThesisComment(
+                commentModel(
+                    paperId,
+                    comment
+                ), 'panel', localStorage.getItem('panelId'), paperId
+            );
+            setComment("");
+            setIsCommentsModalOpen(false);
+            setSuccessMessage("Comment submitted successfully!");
+            // Auto-dismiss the success message after 3 seconds
+            setTimeout(() => {
+                setSuccessMessage("");
+            }, 3000);
+        } catch (error) {
+            console.error("Error creating comment:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const getThesisComment = useThesisStore((state) => state.getThesisComment);
+    
+    const handleFetchComments = async () => {
+        setIsCommentsModalOpen(true);
+        setIsLoadingComments(true);
+        setAllComments([]);
+
+        try {
+            const comments = await getThesisComment(paperId);
+            setAllComments(comments);
+        } catch (error) {
+            console.error("Error fetching comments:", error);
+        } finally {
+            setIsLoadingComments(false);
+        }
     };
 
     return (
         <div className="w-[90%] md:w-80 flex flex-col items-center border shadow-md rounded-lg">
             <div className="w-full flex justify-end p-2 bg-gray-700 rounded-t-lg">
                 <MessageSquare
-                size={30}
-                className="text-white cursor-pointer"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setIsModalOpen(true);
-                }}
+                    size={30}
+                    className="text-white cursor-pointer mx-1"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleFetchComments();
+                    }}
                 />
             </div>
+
+            {/* Toast Notification */}
+            {successMessage && (
+                <div 
+                    className={`
+                        fixed bottom-4 right-4 z-50 
+                        bg-green-500 text-white 
+                        px-6 py-3 rounded-lg shadow-lg 
+                        transition-all duration-1000 ease-in-out
+                        transform ${successMessage ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
+                    `}
+                >
+                    {successMessage}
+                </div>
+            )}
 
             <a href={pdfUrl} className=" w-full flex items-center h-full" target="_blank" rel="noopener noreferrer">
                 <img 
@@ -91,37 +145,128 @@ const PanelAdFileCard = ({ pdfUrl, paperId }) => {
             </div>
 
             {/* Modal for posting comments */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                <h2 className="text-xl font-bold mb-4">Post a Comment</h2>
+            <Modal isOpen={isCommentsModalOpen} onClose={() => {
+                setIsCommentsModalOpen(false);
+                setIsLoadingComments(false);
+                setAllComments([]);
+            }}>
+                <h2 className="text-xl font-bold mb-4">Thesis Comments</h2>
                 
-                {/* Displaying Group & Project Info */}
-                <div className="mb-4 p-3 rounded">
-                    <p>
-                        <span className="font-bold">Group Number:</span> {groupNumber}
-                    </p>
-                    <p>
-                        <span className="font-bold">Project Title:</span> {projectTitle}
-                    </p>
-                    <p>
-                        <span className="font-bold">Submitted On:</span> {submittedOn}
-                    </p>
-                </div>
-                <form onSubmit={handleCommentSubmit} className="flex flex-col gap-3">
-                    <textarea
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        placeholder="Write your comment here..."
-                        className="p-2 border rounded-lg bg-white text-black"
-                        rows={5}
-                        required
-                    />
-                    <button
-                        type="submit"
-                        className="w-full p-2 mt-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
-                    >
-                        Submit
-                    </button>
-                </form>
+                {isLoadingComments ? (
+                    <div className="flex justify-center items-center h-40">
+                        <div className="w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+
+                        {/* Displaying Group & Project Info */}
+                        <div className="mb-4 p-3 rounded">
+                            <p>
+                                <span className="font-bold">Group Number:</span> {groupNumber}
+                            </p>
+                            <p>
+                                <span className="font-bold">Project Title:</span> {projectTitle}
+                            </p>
+                            <p>
+                                <span className="font-bold">Submitted On:</span> {submittedOn}
+                            </p>
+                        </div>
+
+                        {/* Comments Section */}
+                        {!isLoadingComments && (
+                            <div className="space-y-4">
+                                {allComments.map((commentItem, index) => (
+                                    <div 
+                                        key={index} 
+                                        className="p-3 border rounded-lg cursor-pointer"
+                                        onClick={() => handleOpenFullComment(commentItem)}
+                                    >
+                                        <p className="font-bold">
+                                            {commentItem.position?.label || commentItem.name}
+                                        </p>
+                                        <p className="break-words line-clamp-3">
+                                            {commentItem.comment}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Full Comment Modal */}
+                        {selectedComment && (
+                            <Modal 
+                                isOpen={!!selectedComment} 
+                                onClose={() => setSelectedComment(null)}
+                                className="w-full sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-4xl mx-auto"
+                            >
+                                <div className="flex flex-col h-[70vh] max-h-[70vh]">
+                                    <h3 className="text-lg font-bold mb-4 py-2 border-b border-gray-700">
+                                        <span className="font-semibold">
+                                            {selectedComment.position?.label || selectedComment.name}
+                                        </span>
+                                    </h3>
+                                    <div className="flex-grow overflow-y-auto px-2 py-4">
+                                        <p className="whitespace-pre-wrap break-words text-base leading-relaxed">
+                                            {selectedComment.comment}
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 pt-2 border-t border-gray-700">
+                                        <button 
+                                            onClick={() => setSelectedComment(null)}
+                                            className="w-full p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300 ease-in-out"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </Modal>
+                        )}
+
+                        <form onSubmit={handleCommentSubmit} className="flex flex-col gap-3 absolute bottom-0 left-0 right-0 p-6 bg-gray-800 rounded-b-xl">
+                            <textarea
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                                placeholder="Write your comment here..."
+                                className="p-2 border rounded-lg bg-white text-black"
+                                rows={5}
+                                required
+                            />
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full p-2 mt-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center"
+                            >
+                                {isSubmitting ? (
+                                <>
+                                    <svg
+                                    className="animate-spin h-5 w-5 mr-2 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                    ></path>
+                                    </svg>
+                                    Submitting...
+                                </>
+                                ) : (
+                                'Submit'
+                                )}
+                            </button>
+                        </form>
+                    </div>
+                )}
             </Modal>
         </div>
     );
