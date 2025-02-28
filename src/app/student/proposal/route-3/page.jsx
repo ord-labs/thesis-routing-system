@@ -11,7 +11,7 @@ const Page = () => {
     const { theses, loading, getThesisByStudentAndRoute } = useThesisStore((state) => state);
 	
     const getThesisPapers = useCallback(async () => {
-		await getThesisByStudentAndRoute('studentId123')
+		await getThesisByStudentAndRoute(localStorage.getItem('studentId'));
     }, [getThesisByStudentAndRoute]);
 
     useEffect(() => {

@@ -54,6 +54,7 @@ export const useAuthStore = create((set, get) => ({
 			]);
 
 			set({ user, isLoggedIn: true, role });
+			return user
 		} catch (error) {
 			console.error('Registration Error:', error.message);
 		}

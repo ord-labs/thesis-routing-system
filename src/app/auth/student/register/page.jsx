@@ -29,9 +29,7 @@ const Page = () => {
 	const [selectedAdviser, setSelectedAdviser] = useState('');
 	const [selectedGroupNumber, setSelectedGroupNumber] = useState('')
 
-	const registerUser = useAuthStore((state) => state.registerUser)
-	const getCurrentUser = useAuthStore((state) => state.getCurrentUser)
-
+	const { registerStudent, getCurrentUser } = useAuthStore((state) => state);
 	const collegeOptions = [
 		{
 			value: 'CTHM',
@@ -75,10 +73,9 @@ const Page = () => {
 	const handleRegister = async () => {
 		const currentUser = getCurrentUser();
 
-		await registerUser(
+		const user = await registerStudent(
 			idnumber,
 			password,
-			'student',
 			studentModel(
 				idnumber,
 				name,
@@ -90,6 +87,10 @@ const Page = () => {
 				[member1, member2, member3]
 			)
 		)
+
+		localStorage.setItem('studentId', currentUser.id)
+		localStorage.setItem('role', 'student')
+		
 
 		router.push('/student')
 	}
