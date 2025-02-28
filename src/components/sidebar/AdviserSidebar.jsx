@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import SidebarSection from "./SidebarSection";
 import { useSidebarStore } from "../../stores/useSidebarStore";
+import { useAuthStore } from "../../stores/useAuthStore";
+import { useRouter } from "next/navigation";
 
 const AdviserSidebar = () => {
   const [activeSection, setActiveSection] = useState("Title Proposal");
@@ -22,8 +24,10 @@ const AdviserSidebar = () => {
       name: "",
       role: ""
   })
+  const router = useRouter()
   
     const { getUserDetails } = useSidebarStore((state) => state);
+    const { logoutUser } = useAuthStore((state) => state); 
   
     useEffect(() => {
       const getUser = async () => {
@@ -38,6 +42,11 @@ const AdviserSidebar = () => {
       }
       getUser()
     }, [])
+
+    const handleLogout = async () => {
+      await logoutUser()
+      router.push('/')
+    }
 
   return (
     <>
@@ -108,7 +117,7 @@ const AdviserSidebar = () => {
         {/* Logout Button */}
         <button
           className="m-3 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors duration-200 group"
-          onClick={() => setIsOpen(false)}
+          onClick={handleLogout}
         >
           <div className="flex items-center justify-center space-x-2">
             <LogOut size={18} className="text-gray-300 group-hover:text-white" />
