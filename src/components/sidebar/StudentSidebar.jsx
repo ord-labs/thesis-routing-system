@@ -31,6 +31,8 @@ const StudentSidebar = () => {
       const studentId = localStorage.getItem('studentId')
 
       const currentUser = await getUserDetails(role, studentId);
+      console.log(currentUser);
+      
       setUserDetails({
         name: currentUser.name,
         role: role
