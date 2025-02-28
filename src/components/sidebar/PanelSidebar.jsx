@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import SidebarSection from "./SidebarSection";
 import { useSidebarStore } from "../../stores/useSidebarStore";
+import { useAuthStore } from "../../stores/useAuthStore";
+import { useRouter } from "next/navigation";
 
 const PanelSidebar = () => {
   const [activeSection, setActiveSection] = useState("Title Proposal");
@@ -22,8 +24,10 @@ const PanelSidebar = () => {
       name: "",
       role: ""
   })
+  const router = useRouter()
   
     const { getUserDetails } = useSidebarStore((state) => state);
+    const { logoutUser } = useAuthStore((state) => state);
   
     useEffect(() => {
       const getUser = async () => {
@@ -41,6 +45,11 @@ const PanelSidebar = () => {
       }
       getUser()
     }, [])
+
+    const handleLogout = async () => {
+      await logoutUser()
+      router.push('/')
+    }
 
 
   return (
