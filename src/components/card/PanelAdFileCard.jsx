@@ -1,7 +1,7 @@
 'use client'
 
-import { MessageSquare, FileText } from "lucide-react";
-import { useState } from "react";
+import { MessageSquare, FileText, Check, XCircle  } from "lucide-react";
+import { useState, useEffect } from "react";
 import Modal from "../modal/Modal";
 import { useThesisStore } from "../../stores/useThesisStore";
 import { commentModel } from "../../models/commentModel";
@@ -41,7 +41,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
         // Extracting Info
         if (parts.length >= 3) {
             // Assume format like: Group1_ProjectTitle_Date
-            // Group1_ESP32_WiFi_Servers_2025-03-01.pdf
+            // Example: Group1_ESP32_WiFi_Servers_2025-03-01.pdf
             groupNumber = parts[0];
             projectTitle = parts.slice(1, -1).join(' ');
             
@@ -60,6 +60,8 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
 
     const createThesisComment = useThesisStore((state) => state.createThesisComment);
     const updateApproveStatus = useThesisStore((state) => state.updateApproveStatus);
+    const getStatus = useThesisStore((state) => state.getStatus); // Using the getStatus function from the store
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
 
@@ -137,16 +139,16 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                 </div>
             )}
 
-            <a href={pdfUrl} className=" w-full flex items-center h-full" target="_blank" rel="noopener noreferrer">
+            <a href={pdfUrl} className="w-full flex items-center h-full" target="_blank" rel="noopener noreferrer">
                 <img 
-                src={thumbnailUrl} 
-                alt="PDF Preview" 
-                className="  w-full" 
-                onError={(e) => e.target.src = "https://via.placeholder.com/150"} 
+                    src={thumbnailUrl} 
+                    alt="PDF Preview" 
+                    className="w-full" 
+                    onError={(e) => e.target.src = "https://via.placeholder.com/150"} 
                 />
             </a>
 
-            <div className="flex w-full bg-gray-700 text-white  rounded-b-lg">
+            <div className="flex w-full bg-gray-700 text-white rounded-b-lg">
                 <p className="truncate py-6 px-3 ">
                     {filename}
                 </p>
@@ -161,7 +163,14 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                 <div className="flex justify-between items-center">
                     <h2 className="text-xl font-bold mb-4">Thesis Comments</h2>
                     
-                    <button className=" py-2 px-3 mt-5 bg-green-700 hover:bg-green-600 rounded-lg" onClick={handleApproveStatus}>{isApproved? "Paper Approved" : "Approve Paper"}</button>
+                    <button 
+                        className={`flex items-center justify-center gap-2 py-2 px-3 mt-5 rounded-lg transition-colors duration-300 ease-in-out
+                            ${isApproved ? "bg-green-600 hover:bg-green-500 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-800"}`}
+                        onClick={handleApproveStatus}
+                    >
+                        {isApproved ? <Check size={16} /> : <XCircle size={16} />}
+                        <span>{isApproved ? "Paper Approved" : "Approve Paper"}</span>
+                    </button>
                 </div>
                 
                 {isLoadingComments ? (
@@ -170,7 +179,6 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                     </div>
                 ) : (
                     <div className="space-y-4">
-
                         {/* Displaying Group & Project Info */}
                         <div className="mb-4 p-3 rounded">
                             <p>
@@ -231,11 +239,11 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                                         </button>
                                     </div>
                                 </div>
-                                
                             </Modal>
                         )}
 
-                        <form onSubmit={handleCommentSubmit} className="flex flex-col gap-3 absolute bottom-0 left-0 right-0 p-6 bg-gray-800 rounded-b-xl">
+                        {/* Comment Form (flows naturally without absolute positioning) */}
+                        <form onSubmit={handleCommentSubmit} className="flex flex-col gap-3 p-6 bg-gray-800 rounded-b-xl">
                             <textarea
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
@@ -251,39 +259,37 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                                     className="w-full p-2 mt-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center"
                                 >
                                     {isSubmitting ? (
-                                    <>
-                                        <svg
-                                        className="animate-spin h-5 w-5 mr-2 text-white"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        >
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                        ></circle>
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                        ></path>
-                                        </svg>
-                                        Submitting...
-                                    </>
+                                        <>
+                                            <svg
+                                                className="animate-spin h-5 w-5 mr-2 text-white"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    className="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                ></circle>
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                                ></path>
+                                            </svg>
+                                            Submitting...
+                                        </>
                                     ) : (
-                                    'Submit'
+                                        'Submit'
                                     )}
                                 </button>
                             </div>
                         </form>
-                        
                     </div>
                 )}
-                
             </Modal>
         </div>
     );
