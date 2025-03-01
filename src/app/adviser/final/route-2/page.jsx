@@ -3,6 +3,7 @@
 import PanelAdFileCard from '../../../../components/card/PanelAdFileCard';
 import { useCallback, useEffect, useState } from 'react';
 import { useThesisStore } from '../../../../stores/useThesisStore';
+import isAuth from '../../../../components/isAuth';
 
 const Page = () => {
 	const theses = useThesisStore((state) => state.theses);
@@ -39,4 +40,4 @@ const Page = () => {
 	);
 };
 
-export default Page;
+export default isAuth(Page);
