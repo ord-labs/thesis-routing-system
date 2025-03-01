@@ -16,6 +16,7 @@ import SidebarSection from "./SidebarSection";
 import { useSidebarStore } from "../../stores/useSidebarStore";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { useRouter } from "next/navigation";
+import Cookies from 'js-cookie';
 
 const PanelSidebar = () => {
   const [activeSection, setActiveSection] = useState("Title Proposal");
@@ -31,8 +32,8 @@ const PanelSidebar = () => {
   
     useEffect(() => {
       const getUser = async () => {
-        const role = localStorage.getItem('role');
-        const panelId = localStorage.getItem('panelId')
+        const role = Cookies.get('role');
+        const panelId = Cookies.get('panelId');
         console.log(role, panelId);
         
         const currentUser = await getUserDetails(role, panelId);
@@ -83,8 +84,8 @@ const PanelSidebar = () => {
               <User size={20} className="text-white" />
             </div>
             <div>
-              <p className="text-sm font-medium text-white">El Jay</p>
-              <p className="text-xs text-gray-400">Panel</p>
+              <p className="text-sm font-medium text-white">{userDetails.name}</p>
+              <p className="text-xs text-gray-400">{userDetails.role}</p>
             </div>
           </div>
         </div>

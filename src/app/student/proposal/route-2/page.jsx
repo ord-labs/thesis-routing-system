@@ -6,12 +6,13 @@ import TRSButton from '../../../../components/button/TRSButton';
 import SubmitFile from '../../../../components/button/SubmitFile';
 import { useCallback, useEffect, useState } from 'react';
 import { useThesisStore } from '../../../../stores/useThesisStore';
+import Cookies from 'js-cookie';
 
 const Page = () => {
     const { theses, loading, getThesisByStudentAndRoute } = useThesisStore((state) => state);
 	
     const getThesisPapers = useCallback(async () => {
-		await getThesisByStudentAndRoute(localStorage.getItem('studentId'))
+		await getThesisByStudentAndRoute(localStorage.getItem('studentId))
     }, [getThesisByStudentAndRoute]);
 
     useEffect(() => {

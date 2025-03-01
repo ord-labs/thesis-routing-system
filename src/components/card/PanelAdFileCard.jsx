@@ -6,6 +6,7 @@ import Modal from "../modal/Modal";
 import { useThesisStore } from "../../stores/useThesisStore";
 import { commentModel } from "../../models/commentModel";
 import { IKImage } from "imagekitio-next";
+import Cookies from 'js-cookie';
 
 const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
@@ -70,7 +71,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                 commentModel(
                     paperId,
                     comment
-                ), role, localStorage.getItem(`${role}Id`), paperId, isApproved
+                ), role, Cookies.get(`${role}Id`), paperId, isApproved
             );
             setComment("");
             setIsCommentsModalOpen(false);
@@ -105,7 +106,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
 
     const handleApproveStatus = () => {
         setIsApproved(!isApproved);
-        updateApproveStatus(localStorage.getItem('role'), localStorage.getItem('panelId'), paperId, !isApproved);
+        updateApproveStatus(Cookies.get('role'), Cookies.get('panelId'), paperId, !isApproved);
     }
 
     return (
