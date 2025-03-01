@@ -4,6 +4,7 @@ import TRSButton from "./TRSButton";
 import { FileUp } from "lucide-react";
 import { useThesisStore } from "../../stores/useThesisStore";
 import { thesisModel } from "../../models/thesisModel";
+import Cookies from 'js-cookie';
 
 const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT;
 const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY;
@@ -43,7 +44,7 @@ const SubmitFile = () => {
         thesisModel(
           res.name, 
           res.url,
-          localStorage.getItem('studentId'),
+          Cookies.get('studentId'),
           [
             {
             panelId: 'panelId1',

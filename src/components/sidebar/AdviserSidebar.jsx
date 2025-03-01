@@ -16,6 +16,7 @@ import SidebarSection from "./SidebarSection";
 import { useSidebarStore } from "../../stores/useSidebarStore";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { useRouter } from "next/navigation";
+import Cookies from 'js-cookie';
 
 const AdviserSidebar = () => {
   const [activeSection, setActiveSection] = useState("Title Proposal");
@@ -31,8 +32,8 @@ const AdviserSidebar = () => {
   
     useEffect(() => {
       const getUser = async () => {
-        const role = localStorage.getItem('role');
-        const adviserId = localStorage.getItem('adviserId')
+        const role = Cookies.get('role');
+        const adviserId = Cookies.get('adviserId')
   
         const currentUser = await getUserDetails(role, adviserId);
         setUserDetails({
