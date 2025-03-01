@@ -6,6 +6,7 @@ import Modal from "../modal/Modal";
 import { useThesisStore } from "../../stores/useThesisStore";
 import { commentModel } from "../../models/commentModel";
 import { IKImage } from "imagekitio-next";
+import Cookies from 'js-cookie';
 
 const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
@@ -68,12 +69,11 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            await createThesisComment(
-                commentModel(paperId, comment),
-                role,
-                localStorage.getItem(`${role}Id`),
-                paperId,
-                isApproved
+            const result = await createThesisComment(
+                commentModel(
+                    paperId,
+                    comment
+                ), role, Cookies.get(`${role}Id`), paperId, isApproved
             );
             setComment("");
             setIsCommentsModalOpen(false);
@@ -107,31 +107,9 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     };
 
     const handleApproveStatus = () => {
-        const newStatus = !isApproved;
-        setIsApproved(newStatus);
-        updateApproveStatus(
-            localStorage.getItem('role'),
-            localStorage.getItem('panelId'),
-            paperId,
-            newStatus
-        );
+        setIsApproved(!isApproved);
+        updateApproveStatus(Cookies.get('role'), Cookies.get('panelId'), paperId, !isApproved);
     }
-
-    // When the modal opens, fetch the current approved status from the DB
-    useEffect(() => {
-        if (isCommentsModalOpen) {
-            (async () => {
-                try {
-                    const currentRole = localStorage.getItem('role');
-                    const docId = localStorage.getItem('panelId');
-                    const status = await getStatus(currentRole, docId, paperId);
-                    setIsApproved(status);
-                } catch (error) {
-                    console.error("Error fetching approval status:", error);
-                }
-            })();
-        }
-    }, [isCommentsModalOpen, getStatus, paperId]);
 
     return (
         <div className="w-[90%] md:w-80 flex flex-col items-center border shadow-md rounded-lg">
