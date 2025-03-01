@@ -160,7 +160,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                 <div className="flex justify-between items-center">
                     <h2 className="text-xl font-bold mb-4">Thesis Comments</h2>
                     
-                    <button className=" py-2 px-3 mt-5 bg-green-700 hover:bg-green-600 rounded-lg" onClick={handleApproveStatus}>{isApproved? "Paper Approved" : "Approve Paper"}</button>
+                    <button className="py-2 px-3 mt-5 bg-green-700 hover:bg-green-600 rounded-lg" onClick={handleApproveStatus}>{isApproved? "Paper Approved" : "Approve Paper"}</button>
                 </div>
                 
                 {isLoadingComments ? (
@@ -234,7 +234,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                             </Modal>
                         )}
 
-                        <form onSubmit={handleCommentSubmit} className="flex flex-col gap-3 absolute bottom-0 left-0 right-0 p-6 bg-gray-800 rounded-b-xl">
+                        <form onSubmit={handleCommentSubmit} className="flex flex-col gap-3 bottom-0 left-0 right-0 p-6 bg-gray-800 rounded-b-xl">
                             <textarea
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
