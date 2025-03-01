@@ -15,18 +15,21 @@ const Page = () => {
 	const [idnumber, setIdnumber] = useState('');
 	const [password, setPassword] = useState('');
 
-	const { loginStudent, user } = useAuthStore((state) => state)
+	const { loginStudent, user } = useAuthStore((state) => state);
 	const handleLogin = async (e) => {
 		e.preventDefault();
-		await loginStudent(idnumber, password)
+		await loginStudent(idnumber, password).then((res) => {
+			if (res) {
+				localStorage.setItem('studentId', res.id);
+				localStorage.setItem('role', 'student');
 
-		localStorage.setItem('studentId', user.id);
-		localStorage.setItem('role', 'student');
-
-		router.push('/student/proposal/route-1')
+				router.push('/student/proposal/route-1');
+			} else {
+				alert('Invalid email or password.');
+			}
+		});
 	};
 
-	
 	return (
 		<div className="flex flex-col justify-center gap-y-8 bg-smccprimary  w-full h-screen">
 			<div className="flex gap-x-4 justify-center items-center">

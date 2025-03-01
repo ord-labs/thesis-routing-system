@@ -14,18 +14,21 @@ const Page = () => {
 	const [idnumber, setIdnumber] = useState('');
 	const [password, setPassword] = useState('');
 
-	const { loginPanel } = useAuthStore((state) => state)
+	const { loginPanel } = useAuthStore((state) => state);
 
 	const handleLogin = async (e) => {
 		e.preventDefault();
-		
-		const user = await loginPanel(idnumber, password)
-		console.log(user);
-		
-		localStorage.setItem('panelId', user.id);
-		localStorage.setItem('role', 'panel');
 
-		router.push('/panel/proposal/route-1')
+		await loginPanel(idnumber, password).then((res) => {
+			if (res) {
+				localStorage.setItem('panelId', res.id);
+				localStorage.setItem('role', 'panel');
+
+				router.push('/panel/proposal/route-1');
+			} else {
+				alert('Invalid email or password.');
+			}
+		});
 	};
 	return (
 		<div className="flex flex-col justify-center gap-y-8 bg-smccprimary  w-full h-screen">
