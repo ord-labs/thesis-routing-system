@@ -8,7 +8,6 @@ import {
   UserPlus,
   FileText,
   User,
-  Settings,
   Menu,
   X,
 } from "lucide-react";
@@ -116,17 +115,6 @@ const StudentSidebar = () => {
             ]}
             onLinkClick={() => setIsOpen(false)}
           />
-
-          <div className="mt-4 pt-4 border-t border-gray-700">
-            <a
-              href="#"
-              className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200"
-              onClick={() => setIsOpen(false)}
-            >
-              <Settings size={18} />
-              <span>Settings</span>
-            </a>
-          </div>
         </nav>
 
         {/* Logout Button */}
