@@ -23,6 +23,7 @@ import {
 	query,
 	where,
 	addDoc,
+	deleteDoc,
 } from 'firebase/firestore';
 import { app, db } from '../server/firebase' 
 import { studentModel } from '../models/studentModel';
@@ -33,14 +34,42 @@ export const useThesisStore = create((set) => ({
 	theses: [],
 	loading: false,
 
+	updateApproveStatus: async (role, docId, paperId, approvedStatus) => {
+		try {
+			let updateData = {};
+
+			const paperRef = doc(db, 'thesisPaper', paperId)
+			
+			if (role === "adviser") {
+				updateData[`adviserId.approved`] = approvedStatus;
+			} else {
+				const panelRef = doc(db, 'panel', docId);
+				const docSnap = await getDoc(panelRef);
+	
+				const label = docSnap.data().position.label;
+				const panelNum = parseInt(label.split(' ')[1], 10);
+				
+				updateData[`panelIds.${panelNum - 1}.panelId`] = docId;
+				updateData[`panelIds.${panelNum - 1}.approved`] = approvedStatus;
+			} 
+			await updateDoc(paperRef, updateData);
+		} catch (error) {
+			console.error(error);
+		}	
+	},
+
 	getCurrentRoute: () => {
 		if (typeof window !== "undefined") {  // ✅ Prevents errors during SSR
-            const pathnameParts = window.location.pathname.split("/").filter(Boolean);
-            return pathnameParts[pathnameParts.length - 1];
-        }
-		return null
-    },
-
+			const pathnameParts = window.location.pathname.split("/").filter(Boolean);
+			const length = pathnameParts.length;
+	
+			if (length >= 2) {
+				return `/${pathnameParts[length - 2]}/${pathnameParts[length - 1]}`;
+			}
+		}
+		return null;
+	},
+	
 	getAllThesis: async () => {
 		try {
 			set({ loading: true });
@@ -108,24 +137,26 @@ export const useThesisStore = create((set) => ({
 		}
 	},
 
-	createThesisComment: async (comment, role, docId, paperId) => {
+	createThesisComment: async (comment, role, docId, paperId, approvedStatus) => {
 		try {
 
 			let updateData = {};
 
 			const commentRef = collection(db, role, docId, 'comments');
 			const paperRef = doc(db, 'thesisPaper', paperId)
-			
 			if (role === "adviser") {
-				updateData["adviserId"] = docId;
+				updateData["adviserId.adviserId"] = docId;
+				updateData["adviserId.approved"] = approvedStatus;
 			} else {
-				const panelRef = doc(db, 'panel', docId)
+				const panelRef = doc(db, 'panel', docId);
 				const docSnap = await getDoc(panelRef);
-				const label = docSnap.data().position.label
-				const panelNum = label.split(' ')[1]
-
-				updateData[`panelIds.${panelNum-1}`] = docId; 
-			}
+	
+				const label = docSnap.data().position.label;
+				const panelNum = parseInt(label.split(' ')[1], 10);
+	
+				updateData[`panelIds.${panelNum - 1}.panelId`] = docId;
+				updateData[`panelIds.${panelNum - 1}.approved`] = approvedStatus;
+			} 
 			
 			const q = query(commentRef, where("paperId", "==", paperId)); 
 			const querySnapshot = await getDocs(q);
@@ -149,62 +180,100 @@ export const useThesisStore = create((set) => ({
 		try {
 			const adviserCollection = collection(db, "adviser");
 			const panelCollection = collection(db, "panel");
-	
+
 			const adviserSnapshot = await getDocs(adviserCollection);
 			const panelSnapshot = await getDocs(panelCollection);
-	
+
 			let matchingPanels = [];
 			let matchingAdvisers = [];
-	
+
+			const paperRef = doc(db, "thesisPaper", paperId);
+			const paperSnapshot = await getDoc(paperRef);
+
+			let panelIds = [];
+			if (paperSnapshot.exists()) {
+				const data = paperSnapshot.data();
+				const panelIdsArray = Object.values(data.panelIds); 
+
+				panelIds = Array.isArray(panelIdsArray) ? data.panelIds : []; 
+				console.log(panelIds);
+				
+			}
+			 else {
+				console.log("Document not found");
+			}
+
+			// Loop through each panel to get comments or approved status
 			await Promise.all(panelSnapshot.docs.map(async (panelDoc) => {
 				const panelId = panelDoc.id;
 				const commentsRef = collection(db, "panel", panelId, "comments");
 				const q = query(commentsRef, where("paperId", "==", paperId));
 				const commentsSnapshot = await getDocs(q);
-	
+
+				const panelIdsArray = Object.values(panelIds);
+
+				const panelData = panelDoc.data();
+				const panelInfo = panelIdsArray.find(p => p.panelId === panelId); 
+
 				if (!commentsSnapshot.empty) {
 					const firstCommentDoc = commentsSnapshot.docs[0];
-					matchingPanels.push({ 
-						id: panelId, 
-						...panelDoc.data(), 
-						comment: firstCommentDoc.data().comment 
+					matchingPanels.push({
+						id: panelId,
+						...panelData,
+						approved: panelInfo ? panelInfo.approved : false,
+						comment: firstCommentDoc.data().comment
+					});
+				} else if (panelInfo && panelInfo.approved) {
+					// If no comment but approved is true, add it
+					matchingPanels.push({
+						id: panelId,
+						...panelData,
+						comment: null, // No comment
+						approved: true
 					});
 				}
 			}));
-	
-			// Loop through each adviser to check its 'comments' subcollection
+
+			// Loop through each adviser to check comments
 			await Promise.all(adviserSnapshot.docs.map(async (adviserDoc) => {
 				const adviserId = adviserDoc.id;
 				const commentsRef = collection(db, "adviser", adviserId, "comments");
 				const q = query(commentsRef, where("paperId", "==", paperId));
 				const commentsSnapshot = await getDocs(q);
-	
-
 
 				if (!commentsSnapshot.empty) {
-					const firstCommentDoc = commentsSnapshot.docs[0]; 
-					matchingAdvisers.push({ 
-						id: adviserId, 
-						...adviserDoc.data(), 
-						comment: firstCommentDoc.data().comment 
+					const firstCommentDoc = commentsSnapshot.docs[0];
+					matchingAdvisers.push({
+						id: adviserId,
+						...adviserDoc.data(),
+						comment: firstCommentDoc.data().comment
 					});
 				}
-				
 			}));
-			
-			const sortedPanel = matchingPanels.sort((a, b) => {
+
+			// Sort panels based on position.label (ex: "Panel 1", "Panel 2", etc.)
+			const sortedPanels = matchingPanels.sort((a, b) => {
 				const numA = parseInt(a.position.label.replace(/\D/g, ""), 10);
 				const numB = parseInt(b.position.label.replace(/\D/g, ""), 10);
 				return numA - numB;
 			});
 
-			const allComments = [...sortedPanel, ...matchingAdvisers];
+			const allComments = [...sortedPanels, ...matchingAdvisers];
 			console.log(allComments);
 			return allComments;
-	
+
 		} catch (error) {
 			console.error("Error fetching comments:", error);
 			return [];
 		}
-	}
+	},
+
+	deletePaper: async (paperId) => {
+		try {
+			const paperRef = doc(db, "thesisPaper", paperId);
+			await deleteDoc(paperRef);
+		} catch (error) {
+			console.error("Error deleting paper:", error);
+		}
+	},
 }));
