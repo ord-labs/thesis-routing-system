@@ -7,12 +7,13 @@ import { useThesisStore } from "../../stores/useThesisStore";
 import { commentModel } from "../../models/commentModel";
 import { IKImage } from "imagekitio-next";
 
-const PanelAdFileCard = ({ pdfUrl, paperId }) => {
+const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
     const [selectedComment, setSelectedComment] = useState(null);
     const [comment, setComment] = useState("");
     const [allComments, setAllComments] = useState([]);
     const [isLoadingComments, setIsLoadingComments] = useState(false);
+    const [isApproved, setIsApproved] = useState(false);
 
     const thumbnailUrl = `${pdfUrl}/ik-thumbnail.jpg`;
     
@@ -57,6 +58,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId }) => {
     const { groupNumber, projectTitle, submittedOn } = extractInfoFromFilename(filename);
 
     const createThesisComment = useThesisStore((state) => state.createThesisComment);
+    const updateApproveStatus = useThesisStore((state) => state.updateApproveStatus);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
 
@@ -68,7 +70,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId }) => {
                 commentModel(
                     paperId,
                     comment
-                ), 'panel', localStorage.getItem('panelId'), paperId
+                ), role, localStorage.getItem(`${role}Id`), paperId, isApproved
             );
             setComment("");
             setIsCommentsModalOpen(false);
@@ -100,6 +102,11 @@ const PanelAdFileCard = ({ pdfUrl, paperId }) => {
             setIsLoadingComments(false);
         }
     };
+
+    const handleApproveStatus = () => {
+        setIsApproved(!isApproved);
+        updateApproveStatus(localStorage.getItem('role'), localStorage.getItem('panelId'), paperId, !isApproved);
+    }
 
     return (
         <div className="w-[90%] md:w-80 flex flex-col items-center border shadow-md rounded-lg">
@@ -150,7 +157,11 @@ const PanelAdFileCard = ({ pdfUrl, paperId }) => {
                 setIsLoadingComments(false);
                 setAllComments([]);
             }}>
-                <h2 className="text-xl font-bold mb-4">Thesis Comments</h2>
+                <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-bold mb-4">Thesis Comments</h2>
+                    
+                    <button className=" py-2 px-3 mt-5 bg-green-700 hover:bg-green-600 rounded-lg" onClick={handleApproveStatus}>{isApproved? "Paper Approved" : "Approve Paper"}</button>
+                </div>
                 
                 {isLoadingComments ? (
                     <div className="flex justify-center items-center h-40">
@@ -219,6 +230,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId }) => {
                                         </button>
                                     </div>
                                 </div>
+                                
                             </Modal>
                         )}
 
@@ -231,42 +243,46 @@ const PanelAdFileCard = ({ pdfUrl, paperId }) => {
                                 rows={5}
                                 required
                             />
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="w-full p-2 mt-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center"
-                            >
-                                {isSubmitting ? (
-                                <>
-                                    <svg
-                                    className="animate-spin h-5 w-5 mr-2 text-white"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                    ></path>
-                                    </svg>
-                                    Submitting...
-                                </>
-                                ) : (
-                                'Submit'
-                                )}
-                            </button>
+                            <div>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="w-full p-2 mt-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center"
+                                >
+                                    {isSubmitting ? (
+                                    <>
+                                        <svg
+                                        className="animate-spin h-5 w-5 mr-2 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                        ></path>
+                                        </svg>
+                                        Submitting...
+                                    </>
+                                    ) : (
+                                    'Submit'
+                                    )}
+                                </button>
+                            </div>
                         </form>
+                        
                     </div>
                 )}
+                
             </Modal>
         </div>
     );

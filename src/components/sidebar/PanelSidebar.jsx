@@ -121,7 +121,7 @@ const PanelSidebar = () => {
         {/* Logout Button */}
         <button
           className="m-3 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors duration-200 group"
-          onClick={() => setIsOpen(false)}
+          onClick={handleLogout}
         >
           <div className="flex items-center justify-center space-x-2">
             <LogOut size={18} className="text-gray-300 group-hover:text-white" />

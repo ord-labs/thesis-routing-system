@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, CircleCheck, Ellipsis } from "lucide-react";
+import { ChevronDown, CircleCheck, CircleXIcon, Ellipsis } from "lucide-react";
 import { useEffect, useState } from "react";
 import Modal from "../modal/Modal";
 import { IKImage } from "imagekitio-next";
@@ -13,7 +13,7 @@ const StudentFileCard = ({ pdfUrl, paperId }) => {
     const [openCommentIndex, setOpenCommentIndex] = useState(null); 
     const [comments, setComments] = useState([{}]);   
 
-    const { getThesisComment } = useThesisStore((state) => state)
+    const { getThesisComment, deletePaper } = useThesisStore((state) => state)
 
     const thumbnailUrl = `${pdfUrl}/ik-thumbnail.jpg`;
     
@@ -24,6 +24,7 @@ const StudentFileCard = ({ pdfUrl, paperId }) => {
     const toggleMenu = async () => {   
         try {  
             const fetchedComments = await getThesisComment(paperId ); 
+            console.log(fetchedComments);
             
             setComments(Array.isArray(fetchedComments) ? fetchedComments : []);  
         } catch (error) {  
@@ -36,8 +37,12 @@ const StudentFileCard = ({ pdfUrl, paperId }) => {
 
     const toggleComment = (index) => {
         setOpenCommentIndex(openCommentIndex === index ? null : index);
-        
     };
+
+    const handleDelete = () => {
+        deletePaper(paperId);
+        setIsMenuOpen(false);
+    }
     
     return (
         <div className="w-[90%] bg-white md:w-80 flex flex-col items-center  border shadow-md  rounded-lg ">
@@ -63,29 +68,41 @@ const StudentFileCard = ({ pdfUrl, paperId }) => {
         <Modal isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
                 <h2 className="text-xl font-bold mb-4">Details</h2>
                 <div className="flex flex-col gap-7 p-3 bg-gray-600 rounded-lg">
-                    {comments.map((comment, index) => (
-                        <div key={index} className="flex flex-col gap-3">
-                            <div className="flex justify-between">
-                                <div className="flex gap-2">
-                                    <ChevronDown 
-                                        className="cursor-pointer" 
-                                        onClick={() => toggleComment(index)} 
-                                    />
-                                    <p>{comment.name}</p>
+                    {comments.length > 0 ? (
+                        comments.map((comment, index) => (
+                            <div key={index} className="flex flex-col gap-3">
+                                <div className="flex justify-between">
+                                    <div className="flex gap-2">
+                                        <ChevronDown 
+                                            className="cursor-pointer" 
+                                            onClick={() => toggleComment(index)} 
+                                        />
+                                        <p>{comment.name}</p>
+                                    </div>
+                                    {index !== comments.length - 1 ? (
+                                        comment.approved ? (
+                                            <span className="text-green-500 flex items-center">
+                                                <CircleCheck className="mr-1" /> Approved
+                                            </span>
+                                        ) : (
+                                            <span className="text-red-500 flex items-center">
+                                                <CircleXIcon className="mr-1" /> Not Approved
+                                            </span>
+                                        )
+                                    ) : null}
                                 </div>
-                                <span className="flex gap-2 items-center">
-                                    <CircleCheck size={20} /> Approved
-                                </span>
+                                <Accordion isCommentOpen={openCommentIndex === index}>
+                                    <div className="pl-3 border-l-2 rounded-lg text-black border-gray-600 bg-white space-y-2 py-2">
+                                        {comment.comment}
+                                    </div>
+                                </Accordion>
                             </div>
-                            <Accordion isCommentOpen={openCommentIndex === index}>
-                                <div className="pl-3 border-l-2 rounded-lg text-black border-gray-600 bg-white space-y-2 py-2">
-                                    {comment.comment}
-                                </div>
-                            </Accordion>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p>No comments found.</p>
+                    )}
                 </div>
-                <button className="w-full p-2 mt-5 bg-red-700 hover:bg-red-600 rounded-lg">Delete</button>
+                <button className="w-full p-2 mt-5 bg-red-700 hover:bg-red-600 rounded-lg" onClick={handleDelete}>Delete</button>
             </Modal>
     
         </div>

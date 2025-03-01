@@ -43,9 +43,29 @@ const SubmitFile = () => {
         thesisModel(
           res.name, 
           res.url,
-          'studentId123', // replace with actual student ID
-          ['panelId1', 'panelId2'], // replace with actual panel IDs
-          'adviserId123', // replace with actual adviser ID
+          localStorage.getItem('studentId'),
+          [
+            {
+            panelId: 'panelId1',
+            approved: false
+            },
+            {
+              panelId: 'panelId2',
+              approved: false
+            },
+            {
+              panelId: 'panelId3',
+              approved: false
+            },
+            {
+              panelId: 'panelId4',
+              approved: false
+            }, 
+          ],
+          {
+            adviserId: 'adviserId123',
+            approved: false
+          },
           route,
         )
       );

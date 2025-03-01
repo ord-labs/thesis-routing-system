@@ -9,7 +9,7 @@ const Modal = ({ isOpen, onClose, children, className = '' }) => {
                     p-6 rounded-xl shadow-lg 
                     w-full sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] 
                     max-w-4xl mx-auto 
-                    h-[80vh] max-h-[90vh]
+                    max-h-[90vh]
                     relative 
                     ${className}
                 `} 

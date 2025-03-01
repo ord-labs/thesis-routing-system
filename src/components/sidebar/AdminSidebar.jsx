@@ -49,7 +49,7 @@ const AdminSidebar = () => {
 
   const handleLogout = async () => {
     await logoutUser();
-    router.push('/auth/admin');
+    router.push('/');
   };
 
   const handleSectionChange = (title) => {
