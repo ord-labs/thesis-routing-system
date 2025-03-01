@@ -58,6 +58,43 @@ export const useThesisStore = create((set) => ({
 		}	
 	},
 
+	getStatus: async (role, docId, paperId) => {
+		try {
+			// Get the thesis paper document
+			const paperRef = doc(db, 'thesisPaper', paperId);
+			const paperSnap = await getDoc(paperRef);
+		
+			if (!paperSnap.exists()) {
+			throw new Error('Thesis paper not found');
+			}
+		
+			const paperData = paperSnap.data();
+		
+			if (role === "adviser") {
+			// Return the approved status for the adviser
+			return paperData.adviserId?.approved;
+			} else {
+			// For panel members, fetch the panel document to determine the panel's position
+			const panelRef = doc(db, 'panel', docId);
+			const panelSnap = await getDoc(panelRef);
+		
+			if (!panelSnap.exists()) {
+				throw new Error('Panel document not found');
+			}
+		
+			const panelData = panelSnap.data();
+			const label = panelData.position.label;
+			const panelNum = parseInt(label.split(' ')[1], 10);
+		
+			// Return the approved status from the corresponding panelIds array
+			return paperData.panelIds?.[panelNum - 1]?.approved;
+			}
+		} catch (error) {
+			console.error("Error fetching approved status:", error);
+			return null;
+		}
+	},
+
 	getCurrentRoute: () => {
 		if (typeof window !== "undefined") {  // ✅ Prevents errors during SSR
 			const pathnameParts = window.location.pathname.split("/").filter(Boolean);
