@@ -17,6 +17,7 @@ import {
 	addDoc,
 } from 'firebase/firestore';
 import { app, auth, db } from '../server/firebase'; // Adjust to your Firebase config file
+import Cookies from 'js-cookie';
 
 export const useAuthStore = create((set, get) => ({
 	user: null,
@@ -124,6 +125,23 @@ export const useAuthStore = create((set, get) => ({
 	logoutUser: async () => {
 		try {
 			await signOut(auth);
+			const role = Cookies.get('role');
+
+			switch (role) {
+				case 'admin':
+					Cookies.remove('adminId');
+				case 'student':
+					Cookies.remove('studentId');
+				case 'panel':
+					Cookies.remove('panelId');
+				case 'adviser':
+					Cookies.remove('adviserId');
+				default:
+					Cookies.remove('userId');
+			}
+			Cookies.remove('accessToken');
+			Cookies.remove('role');
+
 			set({ user: null, isLoggedIn: false, role: null });
 		} catch (error) {
 			console.error('Logout Error:', error.message);
