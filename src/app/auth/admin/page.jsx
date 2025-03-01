@@ -21,6 +21,7 @@ const Page = () => {
 		await loginAdmin(email, password).then((res) => {
 			if (res) {
 				Cookies.set('accessToken', res.accessToken);
+				Cookies.set('role', 'admin');
 				router.push('/admin/proposal/route-1');
 			} else {
 				alert('Invalid email or password');
