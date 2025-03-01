@@ -10,6 +10,7 @@ import Link from 'next/link';
 import TRSDropdown from '../../../../components/input/TRSDropdown';
 import { useAuthStore } from '../../../../stores/useAuthStore';
 import { studentModel } from '../../../../models/studentModel';
+import Cookies from 'js-cookie';
 
 const Page = () => {
 	const router = useRouter();
@@ -89,8 +90,8 @@ const Page = () => {
 
 		await loginStudent(idnumber, password).then((res) => {
 			if (res) {
-				localStorage.setItem('studentId', res.id);
-				localStorage.setItem('role', 'student');
+				Cookies.set('studentId', res.id);
+				Cookies.set('role', 'student');
 
 				router.push('/student/proposal/route-1');
 			} else {

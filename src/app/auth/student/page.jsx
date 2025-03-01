@@ -8,6 +8,7 @@ import { FormInput } from 'lucide-react';
 import TRSInput from '../../../components/input/TRSInput';
 import Link from 'next/link';
 import { useAuthStore } from '../../../stores/useAuthStore';
+import Cookies from 'js-cookie';
 
 const Page = () => {
 	const router = useRouter();
@@ -20,8 +21,8 @@ const Page = () => {
 		e.preventDefault();
 		await loginStudent(idnumber, password).then((res) => {
 			if (res) {
-				localStorage.setItem('studentId', res.id);
-				localStorage.setItem('role', 'student');
+				Cookies.set('studentId', res.id);
+				Cookies.set('role', 'student');
 
 				router.push('/student/proposal/route-1');
 			} else {

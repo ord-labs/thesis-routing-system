@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { FormInput } from 'lucide-react';
 import TRSInput from '../../../components/input/TRSInput';
 import { useAuthStore } from '../../../stores/useAuthStore';
+import Cookies from 'js-cookie';
 
 const Page = () => {
 	const router = useRouter();
@@ -21,8 +22,8 @@ const Page = () => {
 
 		await loginPanel(idnumber, password).then((res) => {
 			if (res) {
-				localStorage.setItem('panelId', res.id);
-				localStorage.setItem('role', 'panel');
+				Cookies.set('panelId', res.id);
+				Cookies.set('role', 'panel');
 
 				router.push('/panel/proposal/route-1');
 			} else {
