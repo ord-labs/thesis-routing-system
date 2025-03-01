@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { FormInput } from 'lucide-react';
 import TRSInput from '../../../components/input/TRSInput';
 import { useAuthStore } from '../../../stores/useAuthStore';
+import Cookies from 'js-cookie';
 
 const Page = () => {
 	const router = useRouter();
@@ -14,18 +15,22 @@ const Page = () => {
 	const [idnumber, setIdnumber] = useState('');
 	const [password, setPassword] = useState('');
 
-
-	const { loginAdviser } = useAuthStore((state) => state)
+	const { loginAdviser } = useAuthStore((state) => state);
 
 	const handleLogin = async (e) => {
 		e.preventDefault();
-		
-		const user = await loginAdviser(idnumber, password)
-		
-		localStorage.setItem('adviserId', user.id);
-		localStorage.setItem('role', 'adviser');
 
-		router.push('/adviser/proposal/route-1')
+		await loginAdviser(idnumber, password).then((res) => {
+			if (res) {
+				Cookies.set('accessToken', res.accessToken);
+				Cookies.set('adviserId', res.id);
+				Cookies.set('role', 'adviser');
+
+				router.push('/adviser/proposal/route-1');
+			} else {
+				alert('Invalid email or password.');
+			}
+		});
 	};
 
 	return (

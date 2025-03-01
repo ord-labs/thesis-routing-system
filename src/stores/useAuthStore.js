@@ -25,14 +25,14 @@ export const useAuthStore = create((set, get) => ({
 
 	getCurrentUser: async () => {
 		const auth = getAuth();
-		const currentUser = auth.currentUser
+		const currentUser = auth.currentUser;
 
 		if (!currentUser) {
 			console.log('No user signed in');
-			return null			
+			return null;
 		}
 
-		return currentUser
+		return currentUser;
 	},
 
 	// Register user using ID number
@@ -46,15 +46,15 @@ export const useAuthStore = create((set, get) => ({
 			);
 			const user = userCredential.user;
 
-			const userRef = doc(db, 'users', idNumber); 
-			
+			const userRef = doc(db, 'users', idNumber);
+
 			await Promise.all([
-			  setDoc(userRef, { email: generatedEmail, role }), 
-			  addDoc(collection(db, role), userDetails) 
+				setDoc(userRef, { email: generatedEmail, role }),
+				addDoc(collection(db, role), userDetails),
 			]);
 
 			set({ user, isLoggedIn: true, role });
-			return user
+			return user;
 		} catch (error) {
 			console.error('Registration Error:', error.message);
 		}
@@ -85,9 +85,9 @@ export const useAuthStore = create((set, get) => ({
 				collection(db, 'users'),
 				where('email', '==', `${idNumber}@smcc.edu.ph`)
 			);
-	
+
 			const userSnapshot = await getDocs(userQuery);
-			
+
 			if (!userSnapshot.empty) {
 				const userData = userSnapshot.docs[0].data();
 				const generatedEmail = userData.email; // Get stored email
@@ -98,13 +98,20 @@ export const useAuthStore = create((set, get) => ({
 					generatedEmail,
 					password
 				);
-				const userTypeQUery = query(collection(db, userData.role), where('userId', '==', idNumber));
+				const userTypeQUery = query(
+					collection(db, userData.role),
+					where('userId', '==', idNumber)
+				);
 				const snapshot = await getDocs(userTypeQUery);
-				const doc = snapshot.docs[0]; 
-				const user = { id: doc.id, ...doc.data() };
-					
+				const doc = snapshot.docs[0];
+				const user = {
+					id: doc.id,
+					...doc.data(),
+					accessToken: userCredential.user.accessToken,
+				};
+
 				set({ user, isLoggedIn: true, role: userData.role });
-				return user
+				return user;
 			} else {
 				console.error('Login Error: ID Number not found');
 			}

@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { FormInput } from 'lucide-react';
 import TRSInput from '../../../components/input/TRSInput';
 import { useAuthStore } from '../../../stores/useAuthStore';
+import Cookies from 'js-cookie';
 
 const Page = () => {
 	const router = useRouter();
@@ -18,9 +19,9 @@ const Page = () => {
 
 	const handleLogin = async () => {
 		await loginAdmin(email, password).then((res) => {
-			if (res.accessToken) {
-				localStorage.setItem('accessToken', res.accessToken);
-				router.push('/admin');
+			if (res) {
+				Cookies.set('accessToken', res.accessToken);
+				router.push('/admin/proposal/route-1');
 			} else {
 				alert('Invalid email or password');
 			}

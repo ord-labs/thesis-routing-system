@@ -10,6 +10,7 @@ import Link from 'next/link';
 import TRSDropdown from '../../../../components/input/TRSDropdown';
 import { useAuthStore } from '../../../../stores/useAuthStore';
 import { studentModel } from '../../../../models/studentModel';
+import Cookies from 'js-cookie';
 
 const Page = () => {
 	const router = useRouter();
@@ -22,14 +23,19 @@ const Page = () => {
 	const [member2, setMember2] = useState('');
 	const [member3, setMember3] = useState('');
 	const [schoolYear, setSchoolYear] = useState('');
-	
 
 	const [selectedOption, setSelectedOption] = useState('');
 	const [selectedCollege, setSelectedCollege] = useState('');
+	const [selectedCourse, setSelectedCourse] = useState('');
 	const [selectedAdviser, setSelectedAdviser] = useState('');
-	const [selectedGroupNumber, setSelectedGroupNumber] = useState('')
+	const [selectedGroupNumber, setSelectedGroupNumber] = useState('');
 
-	const { registerStudent, getCurrentUser } = useAuthStore((state) => state);
+	const [passwordMatched, setPasswordMatched] = useState(false);
+
+	const { loginStudent, registerStudent, getCurrentUser } = useAuthStore(
+		(state) => state
+	);
+
 	const collegeOptions = [
 		{
 			value: 'CTHM',
@@ -55,7 +61,7 @@ const Page = () => {
 			{ value: 'IT', label: 'BS in Information Technology' },
 		],
 		CCJE: [{ value: 'Crim', label: 'BS in Criminology' }],
-		CAS: [{ value: 'English', label: 'AB in English'}]
+		CAS: [{ value: 'English', label: 'AB in English' }],
 	};
 
 	const adviserOptions = [
@@ -64,36 +70,43 @@ const Page = () => {
 		{ value: 'mr_lee', label: 'Mr. Robert Lee' },
 	];
 
-	useEffect(() => {
-		console.log(idnumber, password);
-	}, [idnumber, password]);
-
-
-
 	const handleRegister = async () => {
 		const currentUser = getCurrentUser();
 
-		const user = await registerStudent(
+		await registerStudent(
 			idnumber,
 			password,
 			studentModel(
 				idnumber,
 				name,
 				schoolYear,
-				selectedOption,
+				selectedCourse,
 				selectedCollege,
 				selectedAdviser,
 				selectedGroupNumber,
 				[member1, member2, member3]
 			)
-		)
+		);
 
-		localStorage.setItem('studentId', currentUser.id)
-		localStorage.setItem('role', 'student')
-		
+		await loginStudent(idnumber, password).then((res) => {
+			if (res) {
+				Cookies.set('studentId', res.id);
+				Cookies.set('role', 'student');
 
-		router.push('/student')
-	}
+				router.push('/student/proposal/route-1');
+			} else {
+				alert('Invalid email or password.');
+			}
+		});
+	};
+
+	useEffect(() => {
+		if (password === confirmPassword) {
+			setPasswordMatched(true);
+		} else {
+			setPasswordMatched(false);
+		}
+	}, [confirmPassword]);
 
 	return (
 		<div className="flex flex-col justify-center gap-y-8 bg-smccprimary  w-full py-16">
@@ -127,7 +140,7 @@ const Page = () => {
 					onChange={(e) => setIdnumber(e.target.value)}
 				/>
 				<TRSInput
-					label={'Password'}
+					label={'Password (at least 6 characters)'}
 					placeholder={'Enter your password'}
 					value={password}
 					onChange={(e) => setPassword(e.target.value)}
@@ -140,6 +153,12 @@ const Page = () => {
 					onChange={(e) => setConfirmPassword(e.target.value)}
 					type="password"
 				/>
+
+				<p className="-mt-2 text-red-500 text-xs">
+					{!passwordMatched & (confirmPassword != '')
+						? 'Passwords do not match.'
+						: ''}
+				</p>
 
 				<p className="text-center font-semibold text-smccprimary">
 					Researcher Info
@@ -192,7 +211,7 @@ const Page = () => {
 				<TRSDropdown
 					label="Course"
 					options={courseOptions[selectedCollege.value]}
-					onSelect={setSelectedOption}
+					onSelect={setSelectedCourse}
 				/>
 				<TRSDropdown
 					label="Adviser"

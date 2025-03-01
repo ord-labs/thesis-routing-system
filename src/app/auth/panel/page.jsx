@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { FormInput } from 'lucide-react';
 import TRSInput from '../../../components/input/TRSInput';
 import { useAuthStore } from '../../../stores/useAuthStore';
+import Cookies from 'js-cookie';
 
 const Page = () => {
 	const router = useRouter();
@@ -14,18 +15,22 @@ const Page = () => {
 	const [idnumber, setIdnumber] = useState('');
 	const [password, setPassword] = useState('');
 
-	const { loginPanel } = useAuthStore((state) => state)
+	const { loginPanel } = useAuthStore((state) => state);
 
 	const handleLogin = async (e) => {
 		e.preventDefault();
-		
-		const user = await loginPanel(idnumber, password)
-		console.log(user);
-		
-		localStorage.setItem('panelId', user.id);
-		localStorage.setItem('role', 'panel');
 
-		router.push('/panel/proposal/route-1')
+		await loginPanel(idnumber, password).then((res) => {
+			if (res) {
+				Cookies.set('accessToken', res.accessToken);
+				Cookies.set('panelId', res.id);
+				Cookies.set('role', 'panel');
+
+				router.push('/panel/proposal/route-1');
+			} else {
+				alert('Invalid email or password.');
+			}
+		});
 	};
 	return (
 		<div className="flex flex-col justify-center gap-y-8 bg-smccprimary  w-full h-screen">
