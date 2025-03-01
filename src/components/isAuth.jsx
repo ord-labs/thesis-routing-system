@@ -9,31 +9,25 @@ const isAuth = (WrappedComponent) => {
 		const router = useRouter();
 		const pathname = usePathname();
 
-		let isAuthenticated = false;
 		const token = Cookies.get('accessToken');
 		const role = Cookies.get('role');
-
-		if (token) {
-			isAuthenticated = true;
-		}
+		const isAuthenticated = !!token;
 
 		useEffect(() => {
 			if (!isAuthenticated) {
 				router.push('/');
-			} else if (token && role !== undefined) {
-				if (pathname.split('/').length < 3) {
-					router.push(`/${role}/proposal/route-1`);
-				} else {
-					router.push(`${pathname}`);
-				}
+			} else if (role) {
+				router.push(`/${role}/proposal/route-1`);
+			} else {
+				router.push(pathname);
 			}
-		}, [isAuthenticated]);
+		}, [isAuthenticated, role, pathname, router]);
 
 		return <WrappedComponent {...props} />;
 	};
 
 	ProtectRoute.displayName = `isAuth(${
-		WrappedComponent.displayName || WrappedComponent.name
+		WrappedComponent.displayName || WrappedComponent.name || 'Component'
 	})`;
 
 	return ProtectRoute;
