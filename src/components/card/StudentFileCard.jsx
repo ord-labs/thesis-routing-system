@@ -79,7 +79,7 @@ const StudentFileCard = ({ pdfUrl, paperId }) => {
                                         />
                                         <p>{comment.name}</p>
                                     </div>
-                                    {index !== comments.length - 1 ? (
+                                    {comment.position ? (
                                         comment.approved ? (
                                             <span className="text-green-500 flex items-center">
                                                 <CircleCheck className="mr-1" /> Approved
