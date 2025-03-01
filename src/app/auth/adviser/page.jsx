@@ -22,6 +22,7 @@ const Page = () => {
 
 		await loginAdviser(idnumber, password).then((res) => {
 			if (res) {
+				Cookies.set('accessToken', res.accessToken);
 				Cookies.set('adviserId', res.id);
 				Cookies.set('role', 'adviser');
 

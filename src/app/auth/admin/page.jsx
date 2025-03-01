@@ -19,9 +19,9 @@ const Page = () => {
 
 	const handleLogin = async () => {
 		await loginAdmin(email, password).then((res) => {
-			if (res.accessToken) {
+			if (res) {
 				Cookies.set('accessToken', res.accessToken);
-				router.push('/admin');
+				router.push('/admin/proposal/route-1');
 			} else {
 				alert('Invalid email or password');
 			}

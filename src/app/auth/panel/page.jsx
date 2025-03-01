@@ -22,6 +22,7 @@ const Page = () => {
 
 		await loginPanel(idnumber, password).then((res) => {
 			if (res) {
+				Cookies.set('accessToken', res.accessToken);
 				Cookies.set('panelId', res.id);
 				Cookies.set('role', 'panel');
 

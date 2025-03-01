@@ -21,6 +21,7 @@ const Page = () => {
 		e.preventDefault();
 		await loginStudent(idnumber, password).then((res) => {
 			if (res) {
+				Cookies.set('accessToken', res.accessToken);
 				Cookies.set('studentId', res.id);
 				Cookies.set('role', 'student');
 
