@@ -7,6 +7,7 @@ import SubmitFile from '../../../../components/button/SubmitFile';
 import { useCallback, useEffect, useState } from 'react';
 import { useThesisStore } from '../../../../stores/useThesisStore';
 import Cookies from 'js-cookie';
+import isAuth from '../../../../components/isAuth';
 
 const Page = () => {
     const { theses, loading, getThesisByStudentAndRoute } = useThesisStore((state) => state);
@@ -44,4 +45,4 @@ const Page = () => {
 	);
 };
 
-export default Page;
+export default isAuth(Page);
