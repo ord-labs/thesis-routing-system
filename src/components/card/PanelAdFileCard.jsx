@@ -204,18 +204,20 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                 
                 {/* Header: Title + Approve Button */}
                 <div className="flex justify-between items-center p-4 border-b border-gray-700 flex-shrink-0">
-                <h2 className="text-xl font-bold">Thesis Comments</h2>
+                    <h2 className="text-xl font-bold">Thesis Comments</h2>
                 
-                <button 
-                    className={`
-                    flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-colors duration-300 ease-in-out
-                    ${isApproved ? "bg-green-600 hover:bg-green-500 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-800"}
-                    `}
-                    onClick={handleApproveStatus}
-                >
-                    {isApproved ? <Check size={16} /> : <XCircle size={16} />}
-                    <span>{isApproved ? "Paper Approved" : "Approve Paper"}</span>
-                </button>
+                    { role !== 'adviser' && (
+                            <button 
+                            className={`
+                            flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-colors duration-300 ease-in-out
+                            ${isApproved ? "bg-green-600 hover:bg-green-500 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-800"}
+                            `}
+                            onClick={handleApproveStatus}
+                        >
+                            {isApproved ? <Check size={16} /> : <XCircle size={16} />}
+                            <span>{isApproved ? "Paper Approved" : "Approve Paper"}</span>
+                        </button>
+                    )}
                 </div>
 
                 {/* Main Body: Spinner OR Comments (scrollable) */}
@@ -229,9 +231,9 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                     
                     {/* Displaying Group & Project Info */}
                     <div className="mb-4 p-3 rounded">
-                    <p><span className="font-bold">Group Number:</span> {groupNumber}</p>
-                    <p><span className="font-bold">Project Title:</span> {projectTitle}</p>
-                    <p><span className="font-bold">Submitted On:</span> {submittedOn}</p>
+                        <p><span className="font-bold">Group Number:</span> {groupNumber}</p>
+                        <p><span className="font-bold">Project Title:</span> {projectTitle}</p>
+                        <p><span className="font-bold">Submitted On:</span> {submittedOn}</p>
                     </div>
 
                     {/* Comments Section */}
