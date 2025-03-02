@@ -23,6 +23,31 @@ export const useAuthStore = create((set, get) => ({
 	user: null,
 	isLoggedIn: false,
 	role: null,
+	advisers: [],
+
+	getAdvisers: async () => {
+		try {
+			// Query the 'adviser' collection from Firestore
+			const advisersQuery = query(collection(db, 'adviser'));
+			const querySnapshot = await getDocs(advisersQuery);
+
+			// Extract data from Firestore documents and store them in an array
+			const advisersList = querySnapshot.docs.map((doc) => ({
+				id: doc.id,
+				...doc.data(),
+			}));
+
+			const _formattedAdvisers = advisersList.map((adviser) => ({
+				label: adviser.name,
+				value: adviser.id,
+			}));
+
+			// Update the state with the list of advisers
+			set({ advisers: _formattedAdvisers });
+		} catch (error) {
+			console.error('Error fetching advisers:', error.message);
+		}
+	},
 
 	getCurrentUser: async () => {
 		const auth = getAuth();
