@@ -15,11 +15,13 @@ const Page = () => {
 	const [idnumber, setIdnumber] = useState('');
 	const [password, setPassword] = useState('');
 
-	const { loginAdviser } = useAuthStore((state) => state);
+	const { loginAdviser, loginLoading, setLoginLoading } = useAuthStore(
+		(state) => state
+	);
 
 	const handleLogin = async (e) => {
 		e.preventDefault();
-
+		setLoginLoading(true);
 		await loginAdviser(idnumber, password).then((res) => {
 			if (res) {
 				Cookies.set('accessToken', res.accessToken);
@@ -31,6 +33,7 @@ const Page = () => {
 				alert('Invalid email or password.');
 			}
 		});
+		setLoginLoading(false);
 	};
 
 	return (
@@ -71,7 +74,10 @@ const Page = () => {
 					onChange={(e) => setPassword(e.target.value)}
 					type="password"
 				/>
-				<TRSButton label={'Login'} onClick={handleLogin} />
+				<TRSButton
+					label={`${loginLoading ? 'Logging in...' : 'Login'}`}
+					onClick={handleLogin}
+				/>
 			</div>
 		</div>
 	);

@@ -15,11 +15,14 @@ const Page = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
-	const { loginAdmin } = useAuthStore((state) => state);
+	const { loginAdmin, loginLoading, setLoginLoading } = useAuthStore(
+		(state) => state
+	);
 
 	const handleLogin = async () => {
+		setLoginLoading(true);
 		await loginAdmin(email, password).then((res) => {
-			if (res) {
+			if (res.accessToken) {
 				Cookies.set('accessToken', res.accessToken);
 				Cookies.set('role', 'admin');
 				router.push('/admin/proposal/route-1');
@@ -27,6 +30,7 @@ const Page = () => {
 				alert('Invalid email or password');
 			}
 		});
+		setLoginLoading(false);
 	};
 
 	return (
@@ -65,7 +69,10 @@ const Page = () => {
 					onChange={(e) => setPassword(e.target.value)}
 					type="password"
 				/>
-				<TRSButton label={'Login'} onClick={handleLogin} />
+				<TRSButton
+					label={`${loginLoading ? 'Logging in...' : 'Login'}`}
+					onClick={handleLogin}
+				/>
 			</div>
 		</div>
 	);

@@ -22,8 +22,14 @@ import Cookies from 'js-cookie';
 export const useAuthStore = create((set, get) => ({
 	user: null,
 	isLoggedIn: false,
+	loginLoading: false,
 	role: null,
 	advisers: [],
+	setLoginLoading: (status) => {
+		set({
+			loginLoading: status,
+		});
+	},
 
 	getAdvisers: async () => {
 		try {
@@ -104,12 +110,13 @@ export const useAuthStore = create((set, get) => ({
 	},
 
 	// Login using ID Number instead of email
-	loginUser: async (idNumber, password) => {
+	loginUser: async (idNumber, password, role) => {
 		try {
 			// Fetch user details from Firestore using ID number
 			const userQuery = query(
 				collection(db, 'users'),
-				where('email', '==', `${idNumber}@smcc.edu.ph`)
+				where('email', '==', `${idNumber}@smcc.edu.ph`),
+				where('role', '==', role)
 			);
 
 			const userSnapshot = await getDocs(userQuery);
@@ -195,12 +202,12 @@ export const useAuthStore = create((set, get) => ({
 	// 	await useAuthStore.getState().loginAdmin(email, password);
 	// },
 	loginStudent: async (idNumber, password) => {
-		return await useAuthStore.getState().loginUser(idNumber, password);
+		return await useAuthStore.getState().loginUser(idNumber, password, 'student');
 	},
 	loginPanel: async (idNumber, password) => {
-		return await useAuthStore.getState().loginUser(idNumber, password);
+		return await useAuthStore.getState().loginUser(idNumber, password, 'panel');
 	},
 	loginAdviser: async (idNumber, password) => {
-		return await useAuthStore.getState().loginUser(idNumber, password);
+		return await useAuthStore.getState().loginUser(idNumber, password, 'adviser');
 	},
 }));

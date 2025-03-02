@@ -17,7 +17,6 @@ const Page = () => {
         getThesisPapers();
     }, [getThesisPapers]); 
 
-
 	return (
 		<div className='  flex flex-col justify-center md:items-start'>
 			{loading ? (

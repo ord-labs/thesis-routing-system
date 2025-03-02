@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useThesisStore } from '../../stores/useThesisStore';
-import { IKImage } from 'imagekitio-next';
 
 const AdminFileCard = ({ pdfUrl, paperId }) => {
     const [thumbnailUrl, setThumbnailUrl] = useState('');
+    const [status, setStatus] = useState(null);
+    const getThesisStatus = useThesisStore((state) => state.getThesisStatus);
 
     useEffect(() => {
         if (pdfUrl) {
@@ -14,6 +15,15 @@ const AdminFileCard = ({ pdfUrl, paperId }) => {
             setThumbnailUrl(null);
         }
     }, [pdfUrl]);
+
+    useEffect(() => {
+        const fetchStatus = async () => {
+            const status = await getThesisStatus(paperId);
+            console.log('Fetched status:', status); // Debugging information
+            setStatus(status);
+        };
+        fetchStatus();
+    }, [getThesisStatus, paperId]);
 
     const getFilenameFromUrl = (url) => {
         return url.substring(url.lastIndexOf('/') + 1);
@@ -41,6 +51,11 @@ const AdminFileCard = ({ pdfUrl, paperId }) => {
                 <p className="truncate py-6 px-3 ">
                     {filename}
                 </p>
+            </div>
+            <div className="w-full p-2 text-center">
+                <span className={`text-sm font-semibold ${status === 'approved' ? 'text-green-500' : 'text-red-500'}`}>
+                    {status ? (status === 'approved' ? 'Approved' : 'Not Approved') : 'Status Unknown'}
+                </span>
             </div>
         </div>
     );
