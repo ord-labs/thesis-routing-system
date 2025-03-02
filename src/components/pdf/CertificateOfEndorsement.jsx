@@ -58,68 +58,75 @@ const styles = StyleSheet.create({
   },
 });
 
-const CertificateOfEndorsement = () => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      {/* Header with Left and Right Logos */}
-            <View style={styles.header}>
-        <Image src={leftLogo} style={styles.logo} />
-        
-        <View style={styles.headerTextContainer}>
-            <Text style={styles.headerText}>Saint Michael College of Caraga</Text>
-            <Text style={styles.headerText}>Brgy. 4, Nasipit, Agusan del Norte, Philippines</Text>
-            <Text style={styles.headerText}>Tel. Nos. +63 085 343-3251 / +63 085 283-3113</Text>
-            <Text style={styles.headerText}>Fax No. +63 085 808-0892</Text>
-            <Text style={styles.headerText}>www.smccnasipit.edu.ph</Text>
+const CertificateOfEndorsement = ({ date = '', adviserName = 'Unknown Adviser', studentNames = [] }) => {
+  console.log('Rendering CertificateOfEndorsement with:', { date, adviserName, studentNames }); // Debugging information
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Header with Left and Right Logos */}
+        <View style={styles.header}>
+          <Image src={leftLogo} style={styles.logo} />
+          
+          <View style={styles.headerTextContainer}>
+              <Text style={styles.headerText}>Saint Michael College of Caraga</Text>
+              <Text style={styles.headerText}>Brgy. 4, Nasipit, Agusan del Norte, Philippines</Text>
+              <Text style={styles.headerText}>Tel. Nos. +63 085 343-3251 / +63 085 283-3113</Text>
+              <Text style={styles.headerText}>Fax No. +63 085 808-0892</Text>
+              <Text style={styles.headerText}>www.smccnasipit.edu.ph</Text>
+          </View>
+
+          <Image src={rightLogo} style={styles.logo} />
         </View>
 
-        <Image src={rightLogo} style={styles.logo} />
+        <Text style={styles.title}>CERTIFICATE OF ENDORSEMENT</Text>
+
+        <View style={styles.section}>
+          <Text>
+            This is to certify that the following researchers have successfully
+            completed a thorough checking and assessment of their software system
+            and manuscript under my supervision. Therefore, I, {adviserName}, as their
+            Capstone/Thesis Adviser, hereby endorse them to proceed with their
+            Final Oral Defense for the completion of their Capstone Project/Thesis
+            in the degree of Bachelor of Science in Information Technology.
+          </Text>
         </View>
 
+        <View style={styles.section}>
+          <Text>Researchers:</Text>
+          {studentNames.length > 0 ? (
+            studentNames.map((name, index) => (
+              <Text key={index}>{index + 1}. {name}</Text>
+            ))
+          ) : (
+            <Text>No researchers found.</Text>
+          )}
+        </View>
 
-      <Text style={styles.title}>CERTIFICATE OF ENDORSEMENT</Text>
+        <View style={styles.section}>
+          <Text>
+            Their project/thesis has met the required standards and criteria set
+            forth by the College of Computing and Information Sciences, and I am
+            confident in the quality and academic rigor of their work.
+          </Text>
+        </View>
 
-      <View style={styles.section}>
-        <Text>
-          This is to certify that the following researchers have successfully
-          completed a thorough checking and assessment of their software system
-          and manuscript under my supervision. Therefore, I, ___________ as their
-          Capstone/Thesis Adviser, hereby endorse them to proceed with their
-          Final Oral Defense for the completion of their Capstone Project/Thesis
-          in the degree of Bachelor of Science in Information Technology.
-        </Text>
-      </View>
+        <View style={styles.signatureSection}>
+          <Text>Endorsed by:</Text>
+          <Text>____________________________</Text>
+          <Text>Capstone Adviser</Text>
+          <Text>{date}</Text>
+        </View>
 
-      <View style={styles.section}>
-        <Text>Researchers:</Text>
-        <Text>1.  ___________ </Text>
-        <Text>2.  ___________ </Text>
-        <Text>3.  ___________ </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text>
-          Their project/thesis has met the required standards and criteria set
-          forth by the College of Computing and Information Sciences, and I am
-          confident in the quality and academic rigor of their work.
-        </Text>
-      </View>
-
-      <View style={styles.signatureSection}>
-        <Text>Endorsed by:</Text>
-        <Text>____________________________</Text>
-        <Text>Capstone Adviser</Text>
-        <Text>18/10/2024</Text>
-      </View>
-
-      <View style={styles.signature}>
-        <Text>Approved by:</Text>
-        <Text>MARLON JUHN M. TIMOGAN, MIT</Text>
-        <Text>Capstone Project/Thesis Instructor</Text>
-        <Text>18/10/2024</Text>
-      </View>
-    </Page>
-  </Document>
-);
+        <View style={styles.signature}>
+          <Text>Approved by:</Text>
+          <Text>MARLON JUHN M. TIMOGAN, MIT</Text>
+          <Text>Capstone Project/Thesis Instructor</Text>
+          <Text>{date}</Text>
+        </View>
+      </Page>
+    </Document>
+  );
+};
 
 export default CertificateOfEndorsement;
