@@ -365,27 +365,40 @@ export const useThesisStore = create((set) => ({
 		}
 	},
 
-	assignPanelsToPaper: async (paperId, panelId) => {
+	assignPanelsToPaper: async (paperId, panelIds, docId) => {
 		try {
-			
 			let updateData = {};
 
 			const paperRef = doc(db, 'thesisPaper', paperId);
 			const paperSnap = await getDoc(paperRef);
 
-			const panelRef = doc(db, 'panel', docId);
-			const panelSnap = await getDoc(panelRef);
+			// If docId is provided, get its label for panel numbering
+			if (docId) {
+				const panelRef = doc(db, 'panel', docId);
+				const panelSnap = await getDoc(panelRef);
+				
+				if (panelSnap.exists()) {
+					const label = panelSnap.data().position?.label || 'Panel 1';
+					const panelNum = parseInt(label.split(' ')[1], 10) || 1;
 
-			const label = docSnap.data().position.label;
-			const panelNum = parseInt(label.split(' ')[1], 10);
-
-			updateData[`panelIds.${panelNum - 1}.panelId`] = panelId;
-			updateData[`panelIds.${panelNum - 1}.approved`] = false;
+					// Update each panel ID
+					panelIds.forEach((panelId, index) => {
+						updateData[`panelIds.${panelNum - 1 + index}.panelId`] = panelId;
+						updateData[`panelIds.${panelNum - 1 + index}.approved`] = false;
+					});
+				}
+			} else {
+				// Fallback: use first panel's index
+				panelIds.forEach((panelId, index) => {
+					updateData[`panelIds.${index}.panelId`] = panelId;
+					updateData[`panelIds.${index}.approved`] = false;
+				});
+			}
 
 			await updateDoc(paperRef, updateData);
 			
 		} catch (error) {
-			console.error(error);
+			console.error('Error assigning panels:', error);
 		}
 	},
 
