@@ -31,10 +31,15 @@ const Page = () => {
 	const [selectedGroupNumber, setSelectedGroupNumber] = useState('');
 
 	const [passwordMatched, setPasswordMatched] = useState(false);
+	const [adviserOptions, setAdviserOptions] = useState(false);
 
-	const { loginStudent, registerStudent, getCurrentUser } = useAuthStore(
-		(state) => state
-	);
+	const {
+		loginStudent,
+		registerStudent,
+		getCurrentUser,
+		getAdvisers,
+		advisers,
+	} = useAuthStore((state) => state);
 
 	const collegeOptions = [
 		{
@@ -63,12 +68,6 @@ const Page = () => {
 		CCJE: [{ value: 'Crim', label: 'BS in Criminology' }],
 		CAS: [{ value: 'English', label: 'AB in English' }],
 	};
-
-	const adviserOptions = [
-		{ value: 'dr_smith', label: 'Dr. John Smith' },
-		{ value: 'ms_doe', label: 'Ms. Jane Doe' },
-		{ value: 'mr_lee', label: 'Mr. Robert Lee' },
-	];
 
 	const handleRegister = async () => {
 		const currentUser = getCurrentUser();
@@ -107,6 +106,10 @@ const Page = () => {
 			setPasswordMatched(false);
 		}
 	}, [confirmPassword]);
+
+	useEffect(() => {
+		getAdvisers();
+	}, []);
 
 	return (
 		<div className="flex flex-col justify-center gap-y-8 bg-smccprimary  w-full py-16">
@@ -208,14 +211,16 @@ const Page = () => {
 					options={collegeOptions}
 					onSelect={setSelectedCollege}
 				/>
-				<TRSDropdown
-					label="Course"
-					options={courseOptions[selectedCollege.value]}
-					onSelect={setSelectedCourse}
-				/>
+				{selectedCollege !== '' && (
+					<TRSDropdown
+						label="Course"
+						options={courseOptions[selectedCollege.value]}
+						onSelect={setSelectedCourse}
+					/>
+				)}
 				<TRSDropdown
 					label="Adviser"
-					options={adviserOptions}
+					options={advisers}
 					onSelect={setSelectedAdviser}
 				/>
 
