@@ -349,6 +349,46 @@ export const useThesisStore = create((set) => ({
 		}
 	},
 
+	getPanels: async () => {
+		try {
+			const panelsRef = collection(db, 'panel');
+			const panelsSnapshot = await getDocs(panelsRef);
+			
+			const panels = panelsSnapshot.docs.map((doc) => ({
+				id: doc.id,
+				...doc.data()
+			}));
+
+			return panels
+		} catch (error) {
+			console.error(error);
+		}
+	},
+
+	assignPanelsToPaper: async (paperId, panelId) => {
+		try {
+			
+			let updateData = {};
+
+			const paperRef = doc(db, 'thesisPaper', paperId);
+			const paperSnap = await getDoc(paperRef);
+
+			const panelRef = doc(db, 'panel', docId);
+			const panelSnap = await getDoc(panelRef);
+
+			const label = docSnap.data().position.label;
+			const panelNum = parseInt(label.split(' ')[1], 10);
+
+			updateData[`panelIds.${panelNum - 1}.panelId`] = panelId;
+			updateData[`panelIds.${panelNum - 1}.approved`] = false;
+
+			await updateDoc(paperRef, updateData);
+			
+		} catch (error) {
+			console.error(error);
+		}
+	},
+
 	getThesisDetails: async (paperId) => {
 		try {
 			const paperRef = doc(db, 'thesisPaper', paperId);
