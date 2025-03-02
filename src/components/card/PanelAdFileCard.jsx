@@ -41,7 +41,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
         // Extracting Info
         if (parts.length >= 3) {
             // Assume format like: Group1_ProjectTitle_Date
-            // Example: Group1_ESP32_WiFi_Servers_2025-03-01.pdf
+            // Example: Group1_ESP32WiFiServers_2025-03-01.pdf
             groupNumber = parts[0];
             projectTitle = parts.slice(1, -1).join(' ');
             
@@ -188,7 +188,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                     `}
                     onClick={handleApproveStatus}
                 >
-                    {isApproved ? <Check size={16} /> : <XCircle size={16} />}
+                    {isApproved ? <Check size={16} /> : <Check size={16} />}
                     <span>{isApproved ? "Paper Approved" : "Approve Paper"}</span>
                 </button>
                 </div>
