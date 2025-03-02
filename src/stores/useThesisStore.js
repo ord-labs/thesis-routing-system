@@ -152,6 +152,7 @@ export const useThesisStore = create((set) => ({
 
 			return theses;
 		} catch (error) {
+			console.error(error);
 			
 		}
 	},

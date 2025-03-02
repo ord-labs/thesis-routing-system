@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import TRSButton from '../components/button/TRSButton';
 import { useRouter } from 'next/navigation';
-import isAuth from '../components/isAuth';
 
 function Home() {
 	const router = useRouter();
@@ -70,4 +69,4 @@ function Home() {
 	);
 }
 
-export default isAuth(Home);
+export default Home;
