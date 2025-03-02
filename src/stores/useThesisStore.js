@@ -348,6 +348,36 @@ export const useThesisStore = create((set) => ({
 			return null;
 		}
 	},
+
+	getThesisDetails: async (paperId) => {
+		try {
+			const paperRef = doc(db, 'thesisPaper', paperId);
+			const paperSnap = await getDoc(paperRef);
+			if (paperSnap.exists()) {
+				const paperData = paperSnap.data();
+				console.log('Fetched paper data:', paperData); // Debugging information
+				
+				// Fetch adviser name
+				const adviserRef = doc(db, 'adviser', paperData.adviserId);
+				const adviserSnap = await getDoc(adviserRef);
+				const adviserName = adviserSnap.exists() ? adviserSnap.data().name : 'Unknown Adviser';
+				console.log('Fetched adviser name:', adviserName); // Debugging information
+
+				// Fetch student names
+				const studentRef = doc(db, 'student', paperData.studentId);
+				const studentSnap = await getDoc(studentRef);
+				const studentNames = studentSnap.exists() ? [studentSnap.data().name] : ['Unknown Student'];
+				console.log('Fetched student names:', studentNames); // Debugging information
+
+				return { adviserName, studentNames };
+			} else {
+				throw new Error('Thesis paper not found');
+			}
+		} catch (error) {
+			console.error('Error fetching thesis details:', error);
+			return { adviserName: 'Unknown Adviser', studentNames: [] };
+		}
+	},
 }));
 
 const getStatus = async (thesisId) => {

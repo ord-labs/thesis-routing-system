@@ -8,7 +8,10 @@ import CertificateOfEndorsement from '../pdf/CertificateOfEndorsement';
 const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
     const [thumbnailUrl, setThumbnailUrl] = useState('');
     const [status, setStatus] = useState(null);
+    const [adviserName, setAdviserName] = useState('');
+    const [studentNames, setStudentNames] = useState([]);
     const getThesisStatus = useThesisStore((state) => state.getThesisStatus);
+    const getThesisDetails = useThesisStore((state) => state.getThesisDetails);
 
     useEffect(() => {
         if (pdfUrl) {
@@ -27,11 +30,23 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
         fetchStatus();
     }, [getThesisStatus, paperId]);
 
+    useEffect(() => {
+        const fetchDetails = async () => {
+            const details = await getThesisDetails(paperId);
+            console.log('Fetched details:', details); // Debugging information
+            setAdviserName(details.adviserName);
+            setStudentNames(details.studentNames || []);
+        };
+        fetchDetails();
+    }, [getThesisDetails, paperId]);
+
     const getFilenameFromUrl = (url) => {
         return url.substring(url.lastIndexOf('/') + 1);
     };
 
     const filename = getFilenameFromUrl(pdfUrl);
+    const currentDate = new Date().toLocaleDateString();
+    console.log('Current date:', currentDate); // Debugging information
 
     return (
         <div className="w-[90%] md:w-80 flex flex-col items-center border shadow-md rounded-lg">
@@ -62,7 +77,7 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
             {showDownloadLink && status === 'approved' && (
                 <div className="w-full p-2 text-center">
                     <PDFDownloadLink
-                        document={<CertificateOfEndorsement />}
+                        document={<CertificateOfEndorsement date={currentDate} adviserName={adviserName} studentNames={studentNames} />}
                         fileName="Certificate_of_Endorsement.pdf"
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-all"
                     >
