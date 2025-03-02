@@ -1,11 +1,10 @@
 'use client'
 
-import { MessageSquare, FileText, Check, XCircle  } from "lucide-react";
+import { MessageSquare, FileText, Check, XCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import Modal from "../modal/Modal";
 import { useThesisStore } from "../../stores/useThesisStore";
 import { commentModel } from "../../models/commentModel";
-import { IKImage } from "imagekitio-next";
 import Cookies from 'js-cookie';
 
 const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
@@ -15,9 +14,16 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     const [allComments, setAllComments] = useState([]);
     const [isLoadingComments, setIsLoadingComments] = useState(false);
     const [isApproved, setIsApproved] = useState(false);
+    const [thumbnailUrl, setThumbnailUrl] = useState('');
 
-    const thumbnailUrl = `${pdfUrl}/ik-thumbnail.jpg`;
-    
+    useEffect(() => {
+        if (pdfUrl) {
+            setThumbnailUrl(`${pdfUrl}/ik-thumbnail.jpg`);
+        } else {
+            setThumbnailUrl(null);
+        }
+    }, [pdfUrl]);
+
     const handleOpenFullComment = (commentItem) => {
         setSelectedComment(commentItem);
     };
@@ -30,8 +36,8 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
         // Remove file extension
         const filenameWithoutExt = filename.replace(/\.[^/.]+$/, '');
         
-        // Split the filename by underscores or hyphens
-        const parts = filenameWithoutExt.split(/[_-]/);
+        // Split the filename by underscores
+        const parts = filenameWithoutExt.split(/[_]/);
         
         // Default values
         let groupNumber = 'Unknown Group';
@@ -51,7 +57,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                 submittedOn = potentialDate;
             }
         }
-
+        console.log(groupNumber, projectTitle, submittedOn);
         return { groupNumber, projectTitle, submittedOn };
     };
 
@@ -108,11 +114,24 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
 
     useEffect(() => {
         const fetchApprovalStatus = async () => {
-            const status = await getStatus(Cookies.get('role'), Cookies.get('panelId'), paperId);
-            setIsApproved(status ?? false); // Default to false if null
+            try {
+                const role = Cookies.get('role');
+                const panelId = Cookies.get('panelId');
+                if (!role || !panelId || !paperId) {
+                    throw new Error('Missing required parameters');
+                }
+                const status = await getStatus(role, panelId, paperId);
+                setIsApproved(status ?? false); // Default to false if null
+            } catch (error) {
+                console.error('Error fetching approval status:', error.message);
+            }
         };
-    
-        fetchApprovalStatus();
+
+        const role = Cookies.get('role');
+        const panelId = Cookies.get('panelId');
+        if (role && panelId && paperId) {
+            fetchApprovalStatus();
+        }
     }, [paperId]);
 
     const handleApproveStatus = async () => {
@@ -151,12 +170,18 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
             )}
 
             <a href={pdfUrl} className="w-full flex items-center h-full" target="_blank" rel="noopener noreferrer">
-                <img 
-                    src={thumbnailUrl} 
-                    alt="PDF Preview" 
-                    className="w-full" 
-                    onError={(e) => e.target.src = "https://via.placeholder.com/150"} 
-                />
+                {thumbnailUrl ? (
+                    <img 
+                        src={thumbnailUrl || "https://via.placeholder.com/150"} 
+                        alt="PDF Preview" 
+                        className="w-full" 
+                        onError={(e) => e.target.src = "https://via.placeholder.com/150"} 
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                        <span>No Preview Available</span>
+                    </div>
+                )}
             </a>
 
             <div className="flex w-full bg-gray-700 text-white rounded-b-lg">
@@ -179,18 +204,20 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                 
                 {/* Header: Title + Approve Button */}
                 <div className="flex justify-between items-center p-4 border-b border-gray-700 flex-shrink-0">
-                <h2 className="text-xl font-bold">Thesis Comments</h2>
+                    <h2 className="text-xl font-bold">Thesis Comments</h2>
                 
-                <button 
-                    className={`
-                    flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-colors duration-300 ease-in-out
-                    ${isApproved ? "bg-green-600 hover:bg-green-500 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-800"}
-                    `}
-                    onClick={handleApproveStatus}
-                >
-                    {isApproved ? <Check size={16} /> : <Check size={16} />}
-                    <span>{isApproved ? "Paper Approved" : "Approve Paper"}</span>
-                </button>
+                    { role !== 'adviser' && (
+                            <button 
+                            className={`
+                            flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-colors duration-300 ease-in-out
+                            ${isApproved ? "bg-green-600 hover:bg-green-500 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-800"}
+                            `}
+                            onClick={handleApproveStatus}
+                        >
+                            {isApproved ? <Check size={16} /> : <Check size={16} />}
+                            <span>{isApproved ? "Paper Approved" : "Approve Paper"}</span>
+                        </button>
+                    )}
                 </div>
 
                 {/* Main Body: Spinner OR Comments (scrollable) */}
@@ -204,9 +231,9 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                     
                     {/* Displaying Group & Project Info */}
                     <div className="mb-4 p-3 rounded">
-                    <p><span className="font-bold">Group Number:</span> {groupNumber}</p>
-                    <p><span className="font-bold">Project Title:</span> {projectTitle}</p>
-                    <p><span className="font-bold">Submitted On:</span> {submittedOn}</p>
+                        <p><span className="font-bold">Group Number:</span> {groupNumber}</p>
+                        <p><span className="font-bold">Project Title:</span> {projectTitle}</p>
+                        <p><span className="font-bold">Submitted On:</span> {submittedOn}</p>
                     </div>
 
                     {/* Comments Section */}
