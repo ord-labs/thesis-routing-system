@@ -16,9 +16,12 @@ const Page = () => {
 	const [idnumber, setIdnumber] = useState('');
 	const [password, setPassword] = useState('');
 
-	const { loginStudent, user } = useAuthStore((state) => state);
+	const { loginStudent, user, loginLoading, setLoginLoading } = useAuthStore(
+		(state) => state
+	);
 	const handleLogin = async (e) => {
 		e.preventDefault();
+		setLoginLoading(true);
 		await loginStudent(idnumber, password).then((res) => {
 			if (res) {
 				Cookies.set('accessToken', res.accessToken);
@@ -30,6 +33,7 @@ const Page = () => {
 				alert('Invalid email or password.');
 			}
 		});
+		setLoginLoading(false);
 	};
 
 	return (
@@ -71,7 +75,10 @@ const Page = () => {
 					type="password"
 				/>
 
-				<TRSButton label={'Login'} onClick={handleLogin} />
+				<TRSButton
+					label={`${loginLoading ? 'Logging in...' : 'Login'}`}
+					onClick={handleLogin}
+				/>
 				<p className="text-center text-sm">
 					No account yet?{' '}
 					<span>
