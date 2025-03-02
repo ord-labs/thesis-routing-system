@@ -22,8 +22,14 @@ import Cookies from 'js-cookie';
 export const useAuthStore = create((set, get) => ({
 	user: null,
 	isLoggedIn: false,
+	loginLoading: false,
 	role: null,
 	advisers: [],
+	setLoginLoading: (status) => {
+		set({
+			loginLoading: status,
+		});
+	},
 
 	getAdvisers: async () => {
 		try {
