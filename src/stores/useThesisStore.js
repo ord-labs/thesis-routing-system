@@ -330,7 +330,14 @@ export const useThesisStore = create((set) => ({
 				const paperData = paperSnap.data();
 				console.log('Fetched paper data:', paperData); // Debugging information
 				
-				const status = paperData.approved ? 'approved' : 'not approved';
+				const adviserApproved = paperData.adviserId?.approved;
+				const panelIds = Array.isArray(paperData.panelIds) ? paperData.panelIds : [];
+				const panelApproved = panelIds.every(panel => panel.approved);
+				
+				console.log('Adviser approved:', adviserApproved); // Debugging information
+				console.log('Panel approved:', panelApproved); // Debugging information
+				
+				const status = adviserApproved && panelApproved ? 'approved' : 'not approved';
 				console.log('Computed status:', status); // Debugging information
 				return status;
 			} else {
@@ -339,6 +346,76 @@ export const useThesisStore = create((set) => ({
 		} catch (error) {
 			console.error('Error fetching thesis status:', error);
 			return null;
+		}
+	},
+
+	getPanels: async () => {
+		try {
+			const panelsRef = collection(db, 'panel');
+			const panelsSnapshot = await getDocs(panelsRef);
+			
+			const panels = panelsSnapshot.docs.map((doc) => ({
+				id: doc.id,
+				...doc.data()
+			}));
+
+			return panels
+		} catch (error) {
+			console.error(error);
+		}
+	},
+
+	assignPanelsToPaper: async (paperId, panelId) => {
+		try {
+			
+			let updateData = {};
+
+			const paperRef = doc(db, 'thesisPaper', paperId);
+			const paperSnap = await getDoc(paperRef);
+
+			const panelRef = doc(db, 'panel', docId);
+			const panelSnap = await getDoc(panelRef);
+
+			const label = docSnap.data().position.label;
+			const panelNum = parseInt(label.split(' ')[1], 10);
+
+			updateData[`panelIds.${panelNum - 1}.panelId`] = panelId;
+			updateData[`panelIds.${panelNum - 1}.approved`] = false;
+
+			await updateDoc(paperRef, updateData);
+			
+		} catch (error) {
+			console.error(error);
+		}
+	},
+
+	getThesisDetails: async (paperId) => {
+		try {
+			const paperRef = doc(db, 'thesisPaper', paperId);
+			const paperSnap = await getDoc(paperRef);
+			if (paperSnap.exists()) {
+				const paperData = paperSnap.data();
+				console.log('Fetched paper data:', paperData); // Debugging information
+				
+				// Fetch adviser name
+				const adviserRef = doc(db, 'adviser', paperData.adviserId);
+				const adviserSnap = await getDoc(adviserRef);
+				const adviserName = adviserSnap.exists() ? adviserSnap.data().name : 'Unknown Adviser';
+				console.log('Fetched adviser name:', adviserName); // Debugging information
+
+				// Fetch student names
+				const studentRef = doc(db, 'student', paperData.studentId);
+				const studentSnap = await getDoc(studentRef);
+				const studentNames = studentSnap.exists() ? [studentSnap.data().name] : ['Unknown Student'];
+				console.log('Fetched student names:', studentNames); // Debugging information
+
+				return { adviserName, studentNames };
+			} else {
+				throw new Error('Thesis paper not found');
+			}
+		} catch (error) {
+			console.error('Error fetching thesis details:', error);
+			return { adviserName: 'Unknown Adviser', studentNames: [] };
 		}
 	},
 }));
