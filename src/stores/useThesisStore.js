@@ -330,7 +330,14 @@ export const useThesisStore = create((set) => ({
 				const paperData = paperSnap.data();
 				console.log('Fetched paper data:', paperData); // Debugging information
 				
-				const status = paperData.approved ? 'approved' : 'not approved';
+				const adviserApproved = paperData.adviserId?.approved;
+				const panelIds = Array.isArray(paperData.panelIds) ? paperData.panelIds : [];
+				const panelApproved = panelIds.every(panel => panel.approved);
+				
+				console.log('Adviser approved:', adviserApproved); // Debugging information
+				console.log('Panel approved:', panelApproved); // Debugging information
+				
+				const status = adviserApproved && panelApproved ? 'approved' : 'not approved';
 				console.log('Computed status:', status); // Debugging information
 				return status;
 			} else {
