@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useThesisStore } from '../../stores/useThesisStore';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import CertificateOfEndorsement from '../pdf/CertificateOfEndorsement';
 
-const AdminFileCard = ({ pdfUrl, paperId }) => {
+const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
     const [thumbnailUrl, setThumbnailUrl] = useState('');
     const [status, setStatus] = useState(null);
     const getThesisStatus = useThesisStore((state) => state.getThesisStatus);
@@ -57,6 +59,17 @@ const AdminFileCard = ({ pdfUrl, paperId }) => {
                     {status ? (status === 'approved' ? 'Approved' : 'Not Approved') : 'Status Unknown'}
                 </span>
             </div>
+            {showDownloadLink && status === 'approved' && (
+                <div className="w-full p-2 text-center">
+                    <PDFDownloadLink
+                        document={<CertificateOfEndorsement />}
+                        fileName="Certificate_of_Endorsement.pdf"
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-all"
+                    >
+                        {({ loading }) => (loading ? "Generating PDF..." : "Download Endorsement")}
+                    </PDFDownloadLink>
+                </div>
+            )}
         </div>
     );
 };
