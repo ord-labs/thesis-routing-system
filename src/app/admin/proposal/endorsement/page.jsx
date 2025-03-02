@@ -1,8 +1,12 @@
 "use client";
 
 import React from "react";
-import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import dynamic from "next/dynamic";
+
 import CertificateOfEndorsement from "../../../../components/pdf/CertificateOfEndorsement";
+
+const PDFViewer = dynamic(() => import("@react-pdf/renderer").then(mod => mod.PDFViewer), { ssr: false });
+const PDFDownloadLink = dynamic(() => import("@react-pdf/renderer").then(mod => mod.PDFDownloadLink), { ssr: false });
 
 const Page = () => {
   const currentDate = new Date().toLocaleDateString();
