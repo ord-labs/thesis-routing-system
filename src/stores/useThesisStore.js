@@ -398,7 +398,7 @@ export const useThesisStore = create((set) => ({
 				console.log('Fetched paper data:', paperData); // Debugging information
 				
 				// Fetch adviser name
-				const adviserRef = doc(db, 'adviser', paperData.adviserId);
+				const adviserRef = doc(db, 'adviser', paperData.adviserId.adviserId);
 				const adviserSnap = await getDoc(adviserRef);
 				const adviserName = adviserSnap.exists() ? adviserSnap.data().name : 'Unknown Adviser';
 				console.log('Fetched adviser name:', adviserName); // Debugging information
