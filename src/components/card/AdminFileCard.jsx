@@ -1,9 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react';
+import dynamic from "next/dynamic";
+
 import { useThesisStore } from '../../stores/useThesisStore';
-import { PDFDownloadLink } from '@react-pdf/renderer';
 import CertificateOfEndorsement from '../pdf/CertificateOfEndorsement';
+
+
+const PDFViewer = dynamic(() => import("@react-pdf/renderer").then((mod) => mod.PDFViewer), { ssr: false });
+const PDFDownloadLink = dynamic(() => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink), { ssr: false });
 
 const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
     const [thumbnailUrl, setThumbnailUrl] = useState('');
