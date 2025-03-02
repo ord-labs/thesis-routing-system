@@ -60,34 +60,41 @@ export const useThesisStore = create((set) => ({
 
 	getStatus: async (role, docId, paperId) => {
 		try {
+			if (!docId || !paperId) {
+				throw new Error('docId or paperId is undefined');
+			}
+
 			// Get the thesis paper document
 			const paperRef = doc(db, 'thesisPaper', paperId);
 			const paperSnap = await getDoc(paperRef);
 		
 			if (!paperSnap.exists()) {
-			throw new Error('Thesis paper not found');
+				throw new Error('Thesis paper not found');
 			}
 		
 			const paperData = paperSnap.data();
 		
 			if (role === "adviser") {
-			// Return the approved status for the adviser
-			return paperData.adviserId?.approved;
+				// Return the approved status for the adviser
+				return paperData.adviserId?.approved;
 			} else {
-			// For panel members, fetch the panel document to determine the panel's position
-			const panelRef = doc(db, 'panel', docId);
-			const panelSnap = await getDoc(panelRef);
+				// For panel members, fetch the panel document to determine the panel's position
+				const panelRef = doc(db, 'panel', docId);
+				const panelSnap = await getDoc(panelRef);
 		
-			if (!panelSnap.exists()) {
-				throw new Error('Panel document not found');
-			}
+				if (!panelSnap.exists()) {
+					throw new Error('Panel document not found');
+				}
 		
-			const panelData = panelSnap.data();
-			const label = panelData.position.label;
-			const panelNum = parseInt(label.split(' ')[1], 10);
+				const panelData = panelSnap.data();
+				const label = panelData.position?.label;
+				if (!label) {
+					throw new Error('Panel position label not found');
+				}
+				const panelNum = parseInt(label.split(' ')[1], 10);
 		
-			// Return the approved status from the corresponding panelIds array
-			return paperData.panelIds?.[panelNum - 1]?.approved;
+				// Return the approved status from the corresponding panelIds array
+				return paperData.panelIds?.[panelNum - 1]?.approved;
 			}
 		} catch (error) {
 			console.error("Error fetching approved status:", error);
@@ -315,3 +322,24 @@ export const useThesisStore = create((set) => ({
 		}
 	},
 }));
+
+const getStatus = async (thesisId) => {
+	try {
+		const thesisDoc = await getDoc(doc(db, 'theses', thesisId));
+		const thesis = thesisDoc.data();
+
+		if (!thesis) {
+			throw new Error('Thesis not found');
+		}
+
+		const status = thesis.status;
+		if (!status) {
+			throw new Error('Status not found');
+		}
+
+		return status;
+	} catch (error) {
+		console.error('Error fetching approved status:', error.message);
+		throw error;
+	}
+};
