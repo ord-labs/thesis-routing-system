@@ -8,12 +8,12 @@ import Accordion from "../accordion/Accordion";
 import { useThesisStore } from "../../stores/useThesisStore";
 
 
-const StudentFileCard = ({ pdfUrl, paperId }) => {
+const StudentFileCard = ({ pdfUrl, paperId, onDelete }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [openCommentIndex, setOpenCommentIndex] = useState(null); 
     const [comments, setComments] = useState([{}]);   
 
-    const { getThesisComment, deletePaper } = useThesisStore((state) => state)
+    const { getThesisComment, deletePaper, loading, getThesisByStudentAndRoute } = useThesisStore((state) => state)
 
     const thumbnailUrl = `${pdfUrl}/ik-thumbnail.jpg`;
     
@@ -39,8 +39,9 @@ const StudentFileCard = ({ pdfUrl, paperId }) => {
         setOpenCommentIndex(openCommentIndex === index ? null : index);
     };
 
-    const handleDelete = () => {
-        deletePaper(paperId);
+    const handleDelete = async () => {
+        await deletePaper(paperId);
+        onDelete();
         setIsMenuOpen(false);
     }
     

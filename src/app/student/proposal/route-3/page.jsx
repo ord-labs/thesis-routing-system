@@ -11,17 +11,24 @@ import isAuth from '../../../../components/isAuth';
 
 const Page = () => {
     const { theses, loading, getThesisByStudentAndRoute } = useThesisStore((state) => state);
-	
+    const [reloadKey, setReloadKey] = useState(0);
+
     const getThesisPapers = useCallback(async () => {
 		await getThesisByStudentAndRoute(Cookies.get('studentId'));
+        
     }, [getThesisByStudentAndRoute]);
 
     useEffect(() => {
         getThesisPapers();
     }, [getThesisPapers]); 
 
+    const handlePaperDeleted = () => {
+        getThesisPapers();
+    };
+
+    
 	return (
-		<div className='  flex flex-col justify-center md:items-start'>
+		<div className='flex flex-col justify-center md:items-start'>
 			<div className=' md:ml-0 mb-4 ml-12 '>
 				<SubmitFile/>
 			</div>
@@ -33,7 +40,7 @@ const Page = () => {
                 <div className="w-full flex flex-wrap gap-20 justify-center md:justify-start">
                     {theses.length > 0 ? (
                         theses.map((thesis) => (
-                            <StudentFileCard key={thesis.id} paperId={thesis.id} pdfUrl={thesis.fileUrl} />
+                            <StudentFileCard key={thesis.id} onDelete={handlePaperDeleted} paperId={thesis.id}  pdfUrl={thesis.fileUrl} />
                         ))
                     ) : (
                         <p className="text-gray-500 text-center">No thesis papers found.</p>
@@ -44,4 +51,4 @@ const Page = () => {
 	);
 };
 
-export default isAuth(Page);
+export default Page;
