@@ -23,7 +23,7 @@ const sidebarSections = [
 			{ name: 'Route 1', href: '/admin/proposal/route-1' },
 			{ name: 'Route 2', href: '/admin/proposal/route-2' },
 			{ name: 'Route 3', href: '/admin/proposal/route-3' },
-			{ name: 'Indorsement Form', href: '/admin/proposal/endorsement' },
+			{ name: 'Endorsement Form', href: '/admin/proposal/endorsement' },
 		],
 	},
 	{

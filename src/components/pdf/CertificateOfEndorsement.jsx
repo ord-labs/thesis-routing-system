@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     textAlign: "justify",
   },
   signatureSection: {
-    marginTop: 20,
+    marginVertical: 50,
     textAlign: "left",
   },
   signature: {
@@ -92,9 +92,9 @@ const CertificateOfEndorsement = () => (
 
       <View style={styles.section}>
         <Text>Researchers:</Text>
-        <Text>1. [Student Name 1]</Text>
-        <Text>2. [Student Name 2]</Text>
-        <Text>3. [Student Name 3]</Text>
+        <Text>1.  ___________ </Text>
+        <Text>2.  ___________ </Text>
+        <Text>3.  ___________ </Text>
       </View>
 
       <View style={styles.section}>
