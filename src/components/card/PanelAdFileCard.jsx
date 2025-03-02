@@ -37,29 +37,40 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
         const filenameWithoutExt = filename.replace(/\.[^/.]+$/, '');
         
         // Split the filename by underscores
-        const parts = filenameWithoutExt.split(/[_]/);
+        let parts = filenameWithoutExt.split('_');
         
+        // If there's an extra part beyond the expected 3,
+        // and that extra part is not a valid date, remove it.
+        // (This only removes one trailing part; see below for handling multiple.)
+        if (parts.length > 3) {
+            const lastPart = parts[parts.length - 1];
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(lastPart)) {
+                parts.pop(); // Ignore it
+            }
+        }
+    
         // Default values
         let groupNumber = 'Unknown Group';
         let projectTitle = 'Untitled Project';
         let submittedOn = new Date().toISOString().split('T')[0];
-
+    
         // Extracting Info
         if (parts.length >= 3) {
-            // Assume format like: Group1_ProjectTitle_Date
-            // Example: Group1_ESP32WiFiServers_2025-03-01.pdf
+            // Format: Group1_ProjectTitle_Date
+            // Example: Group1_ESP32WiFiServers_2025-01-25.pdf
             groupNumber = parts[0];
             projectTitle = parts.slice(1, -1).join(' ');
-            
+    
             // Try to parse the last part as a date
             const potentialDate = parts[parts.length - 1];
             if (/^\d{4}-\d{2}-\d{2}$/.test(potentialDate)) {
                 submittedOn = potentialDate;
             }
         }
-        console.log(groupNumber, projectTitle, submittedOn);
+    
         return { groupNumber, projectTitle, submittedOn };
     };
+    
 
     const filename = getFilenameFromUrl(pdfUrl);
     const { groupNumber, projectTitle, submittedOn } = extractInfoFromFilename(filename);
