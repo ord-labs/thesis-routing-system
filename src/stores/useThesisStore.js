@@ -321,6 +321,26 @@ export const useThesisStore = create((set) => ({
 			console.error("Error deleting paper:", error);
 		}
 	},
+
+	getThesisStatus: async (paperId) => {
+		try {
+			const paperRef = doc(db, 'thesisPaper', paperId);
+			const paperSnap = await getDoc(paperRef);
+			if (paperSnap.exists()) {
+				const paperData = paperSnap.data();
+				console.log('Fetched paper data:', paperData); // Debugging information
+				
+				const status = paperData.approved ? 'approved' : 'not approved';
+				console.log('Computed status:', status); // Debugging information
+				return status;
+			} else {
+				throw new Error('Thesis paper not found');
+			}
+		} catch (error) {
+			console.error('Error fetching thesis status:', error);
+			return null;
+		}
+	},
 }));
 
 const getStatus = async (thesisId) => {
