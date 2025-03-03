@@ -394,13 +394,51 @@ export const useThesisStore = create((set) => ({
 					updateData[`panelIds.${index}.approved`] = false;
 				});
 			}
-
-			await updateDoc(paperRef, updateData);
-			
+			await updateDoc(paperRef, updateData);			
 		} catch (error) {
 			console.error('Error assigning panels:', error);
 		}
 	},
+
+	fetchPanelsAssigned: async (paperId) => {
+		try {
+			const paperRef = doc(db, 'thesisPaper', paperId);
+			const paperSnap = await getDoc(paperRef);
+
+			if (paperSnap.exists()) {
+				const paperData = paperSnap.data();
+				console.log('paperData: ', paperData);
+				
+				// ang e return ani is ang mga panelIds sa thesisPaper 
+				// to access the panelid kay paperData.panelIds.panelId
+				// dayon pag implement ani sa frontend kay e match ra ang panelIds diri to the panelids nga na fetch sa fetchPanel() na function 
+				return paperData.panelIds;
+			} else {
+				throw new Error('Thesis paper not found');
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	},
+
+	fetchAdviser: async (paperId) => {
+		try{
+			const paperRef = doc(db, 'thesisPaper',  paperId);			
+			const paperSnap = await getDoc(paperRef);
+
+			if (paperSnap.exists()) {
+				const paperData = paperSnap.data();
+
+				const adviserRef = doc(db, 'adviser', paperData.adviserId.adviserId);
+				const adviserSnap = await getDoc(adviserRef);
+				const adviserData = adviserSnap.data();
+
+				return adviserData.name;
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}, 
 
 	getThesisDetails: async (paperId) => {
 		try {
