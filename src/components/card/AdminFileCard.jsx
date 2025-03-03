@@ -17,10 +17,17 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
     const [panels, setPanels] = useState([]);
     const [selectedPanelIds, setSelectedPanelIds] = useState([]);
 
-    const getThesisStatus = useThesisStore((state) => state.getThesisStatus);
-    const getThesisDetails = useThesisStore((state) => state.getThesisDetails);
-    const getPanels = useThesisStore((state) => state.getPanels);
-    const assignPanelsToPaper = useThesisStore((state) => state.assignPanelsToPaper);
+    const { getThesisStatus, getThesisDetails, getPanels, assignPanelsToPaper, fetchPanelsAssigned } = useThesisStore((state) => state);
+    
+    const fetchAssignedPanels = async () => {
+        try {
+            const assignedPanels = await fetchPanelsAssigned(paperId);
+            setSelectedPanelIds(assignedPanels);
+            console.log(assignedPanels);
+        } catch (error) {
+            console.error('Error fetching assigned panels:', error);
+        }
+    };
 
     useEffect(() => {
         if (pdfUrl) {
@@ -56,6 +63,9 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
     const openPanelModal = async () => {
         try {
             const fetchedPanels = await getPanels();
+            const assignedPanels = await fetchPanelsAssigned(paperId);
+            setSelectedPanelIds(assignedPanels);
+            console.log('assigned panels: ',assignedPanels);
             setPanels(fetchedPanels);
             setIsModalOpen(true);
         } catch (error) {
