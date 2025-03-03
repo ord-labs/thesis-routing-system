@@ -422,27 +422,38 @@ export const useThesisStore = create((set) => ({
 	},
 
 	fetchAdviser: async (paperId) => {
-		try{
-			const paperRef = doc(db, 'thesisPaper',  paperId);			
+		try {
+			const paperRef = doc(db, 'thesisPaper', paperId);			
 			const paperSnap = await getDoc(paperRef);
-
+	
 			if (paperSnap.exists()) {
 				const paperData = paperSnap.data();
 				
 				const adviserObj = paperData?.adviserId;
 				if (!adviserObj || !adviserObj.adviserId) {
-				  throw new Error('No valid adviserId found in paperData');
+					console.warn('No valid adviserId found in paperData. Returning placeholder.');
+					return "Unknown Adviser";
 				}
+	
 				const adviserRef = doc(db, 'adviser', adviserObj.adviserId);
 				const adviserSnap = await getDoc(adviserRef);
-				const adviserData = adviserSnap.data();
-
-				return adviserData.name;
+	
+				if (adviserSnap.exists()) {
+					const adviserData = adviserSnap.data();
+					return adviserData.name || "Unknown Adviser";
+				} else {
+					console.warn('Adviser document not found. Returning placeholder.');
+					return "Unknown Adviser";
+				}
+			} else {
+				console.warn('Thesis paper not found. Returning placeholder.');
+				return "Unknown Adviser";
 			}
 		} catch (error) {
 			console.error(error);
+			return "Unknown Adviser";
 		}
-	}, 
+	},
 
 	getThesisDetails: async (paperId) => {
 		try {
