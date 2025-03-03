@@ -45,28 +45,8 @@ const SubmitFile = () => {
           res.name, 
           res.url,
           Cookies.get('studentId'),
-          [
-            {
-            panelId: 'panelId1',
-            approved: false
-            },
-            {
-              panelId: 'panelId2',
-              approved: false
-            },
-            {
-              panelId: 'panelId3',
-              approved: false
-            },
-            {
-              panelId: 'panelId4',
-              approved: false
-            }, 
-          ],
-          {
-            adviserId: 'adviserId123',
-            approved: false
-          },
+          [],
+          {},
           route,
         )
       );
