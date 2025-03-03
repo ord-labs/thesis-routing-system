@@ -238,6 +238,7 @@ console.log('Current date:', currentDate);
                                 Array.isArray(selectedPanelIds) &&
                                 selectedPanelIds.includes(panel.id);
 
+                                
                                 // Check if this panel is already assigned in DB
                                 // assignedPanels is an array of objects: [{ panelId, approved }, ...]
                                 const assignedPanelsArray = Array.isArray(assignedPanels)
