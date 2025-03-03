@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useEffect, useState } from 'react';
 import dynamic from "next/dynamic";
@@ -6,9 +6,7 @@ import { Settings, Check } from 'lucide-react'; // Import icons
 import { useThesisStore } from '../../stores/useThesisStore';
 import CertificateOfEndorsement from '../pdf/CertificateOfEndorsement';
 import Modal from '../modal/Modal';
-
-const PDFViewer = dynamic(() => import("@react-pdf/renderer").then((mod) => mod.PDFViewer), { ssr: false });
-const PDFDownloadLink = dynamic(() => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink), { ssr: false });
+import downloadPDF from './pdfDownloader';
 
 const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
     const [thumbnailUrl, setThumbnailUrl] = useState('');
@@ -131,16 +129,18 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
                 </span>
             </div>
 
-            {/* Download Endorsement */}
-            {showDownloadLink && status === 'approved' && (
+            {status === 'approved' && showDownloadLink && (
                 <div className="w-full p-2 text-center">
-                    <PDFDownloadLink
-                        document={<CertificateOfEndorsement date={currentDate} adviserName={adviserName} studentNames={studentNames} />}
-                        fileName="Certificate_of_Endorsement.pdf"
+                    <button 
+                        onClick={() => downloadPDF({
+                            date: new Date().toLocaleDateString(),
+                            adviserName,
+                            studentNames
+                        })}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-all"
                     >
-                        {({ loading }) => (loading ? "Generating PDF..." : "Download Endorsement")}
-                    </PDFDownloadLink>
+                        Download Endorsement
+                    </button>
                 </div>
             )}
 
