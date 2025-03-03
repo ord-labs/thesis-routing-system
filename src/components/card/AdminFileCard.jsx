@@ -64,21 +64,32 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
         try {
             const fetchedPanels = await getPanels();
             const assignedPanels = await fetchPanelsAssigned(paperId);
-            setSelectedPanelIds(assignedPanels);
-            console.log('assigned panels: ',assignedPanels);
-            setPanels(fetchedPanels);
+            
+            // Ensure assignedPanels is an array
+            const panelIds = Array.isArray(assignedPanels) 
+                ? assignedPanels 
+                : (assignedPanels ? [assignedPanels] : []);
+            
+            setSelectedPanelIds(panelIds);
+            console.log('Assigned panels:', panelIds);
+            setPanels(fetchedPanels || []);
             setIsModalOpen(true);
         } catch (error) {
             console.error('Error fetching panels:', error);
+            setPanels([]);
+            setSelectedPanelIds([]);
         }
     };
 
     const handlePanelSelect = (panelId) => {
         setSelectedPanelIds(prev => {
-            if (prev.includes(panelId)) {
-                return prev.filter(id => id !== panelId);
+            // Ensure prev is an array
+            const currentSelection = Array.isArray(prev) ? prev : [];
+            
+            if (currentSelection.includes(panelId)) {
+                return currentSelection.filter(id => id !== panelId);
             }
-            return prev.length < 4 ? [...prev, panelId] : prev;
+            return currentSelection.length < 4 ? [...currentSelection, panelId] : currentSelection;
         });
     };
 
@@ -156,40 +167,51 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
 
             {/* Panel Assignment Modal */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                <div className="bg-white p-0 rounded-xl shadow-xl max-w-2xl w-full overflow-hidden">
+                <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden">
                     {/* Modal Header */}
-                    <div className="bg-indigo-50 p-6 border-b border-indigo-100">
+                    <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-800">Assign Evaluation Panels</h2>
-                                <p className="text-sm text-gray-600 mt-1">
-                                    {selectedPanelIds.length}/4 panels selected
+                                <h2 className="text-2xl font-bold text-white">Assign Evaluation Panels</h2>
+                                <p className="text-sm text-indigo-100 mt-1">
+                                    Select up to 4 panels for this thesis paper
                                 </p>
+                            </div>
+                            <div className="bg-white/20 text-white px-3 py-1 rounded-full">
+                                {selectedPanelIds.length}/4 selected
                             </div>
                         </div>
                     </div>
 
                     {/* Panel List */}
-                    <div className="max-h-[60vh] overflow-y-auto p-6">
-                        <h3 className="text-sm font-semibold text-gray-700 mb-4">Available Panels</h3>
-                        <div className="grid gap-3">
+                    <div className="max-h-[60vh] overflow-y-auto p-6 space-y-4">
+                        <div className="grid gap-4 md:grid-cols-2">
                             {panels.map(panel => (
                                 <div 
                                     key={panel.id}
                                     onClick={() => handlePanelSelect(panel.id)}
-                                    className={`p-4 rounded-lg border cursor-pointer transition-all
-                                        ${selectedPanelIds.includes(panel.id)
-                                            ? 'border-indigo-300 bg-indigo-50'
-                                            : 'border-gray-200 hover:border-indigo-200'}`}
+                                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-105
+                                        ${(selectedPanelIds || []).includes(panel.id)
+                                            ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                                            : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'}`}
                                 >
                                     <div className="flex items-center justify-between">
-                                        <h4 className="font-medium text-gray-800">{panel.name}</h4>
-                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center
-                                            ${selectedPanelIds.includes(panel.id)
+                                        <div>
+                                            <h4 className={`font-semibold ${(selectedPanelIds || []).includes(panel.id) ? 'text-indigo-700' : 'text-gray-800'}`}>
+                                                {panel.name}
+                                            </h4>
+                                            {panel.department && (
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    {panel.department}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all
+                                            ${(selectedPanelIds || []).includes(panel.id)
                                                 ? 'bg-indigo-600 border-indigo-600'
                                                 : 'bg-white border-gray-300'}`}>
-                                            {selectedPanelIds.includes(panel.id) && (
-                                                <Check className="w-4 h-4 text-white" />
+                                            {(selectedPanelIds || []).includes(panel.id) && (
+                                                <Check className="w-5 h-5 text-white" />
                                             )}
                                         </div>
                                     </div>
@@ -199,17 +221,20 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
                     </div>
 
                     {/* Modal Footer */}
-                    <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
-                        <button
+                    <div className="bg-gray-50 p-6 flex justify-end space-x-4">
+                        <button 
                             onClick={() => setIsModalOpen(false)}
-                            className="px-5 py-2 text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+                            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                         >
                             Cancel
                         </button>
-                        <button
+                        <button 
                             onClick={handlePanelAssignment}
                             disabled={selectedPanelIds.length === 0}
-                            className="px-5 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                            className={`px-6 py-2 rounded-lg text-white transition-all duration-300 
+                                ${selectedPanelIds.length > 0 
+                                    ? 'bg-indigo-600 hover:bg-indigo-700 shadow-md' 
+                                    : 'bg-gray-400 cursor-not-allowed'}`}
                         >
                             Assign Panels
                         </button>

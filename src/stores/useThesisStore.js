@@ -428,8 +428,12 @@ export const useThesisStore = create((set) => ({
 
 			if (paperSnap.exists()) {
 				const paperData = paperSnap.data();
-
-				const adviserRef = doc(db, 'adviser', paperData.adviserId.adviserId);
+				
+				const adviserObj = paperData?.adviserId;
+				if (!adviserObj || !adviserObj.adviserId) {
+				  throw new Error('No valid adviserId found in paperData');
+				}
+				const adviserRef = doc(db, 'adviser', adviserObj.adviserId);
 				const adviserSnap = await getDoc(adviserRef);
 				const adviserData = adviserSnap.data();
 
@@ -449,10 +453,9 @@ export const useThesisStore = create((set) => ({
 				console.log('Fetched paper data:', paperData); // Debugging information
 				
 				// Fetch adviser name
-				const adviserRef = doc(db, 'adviser', paperData.adviserId.adviserId);
-				const adviserSnap = await getDoc(adviserRef);
-				const adviserName = adviserSnap.exists() ? adviserSnap.data().name : 'Unknown Adviser';
-				console.log('Fetched adviser name:', adviserName); // Debugging information
+				const { fetchAdviser } = useThesisStore.getState();
+				const adviserName = await fetchAdviser(paperId) || 'Unknown Adviser';
+				console.log('Fetched adviser name:', adviserName);
 
 				// Fetch student names
 				const studentRef = doc(db, 'student', paperData.studentId);
