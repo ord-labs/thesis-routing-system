@@ -422,23 +422,38 @@ export const useThesisStore = create((set) => ({
 	},
 
 	fetchAdviser: async (paperId) => {
-		try{
-			const paperRef = doc(db, 'thesisPaper',  paperId);			
+		try {
+			const paperRef = doc(db, 'thesisPaper', paperId);			
 			const paperSnap = await getDoc(paperRef);
-
+	
 			if (paperSnap.exists()) {
 				const paperData = paperSnap.data();
-
-				const adviserRef = doc(db, 'adviser', paperData.adviserId.adviserId);
+				
+				const adviserObj = paperData?.adviserId;
+				if (!adviserObj || !adviserObj.adviserId) {
+					console.warn('No valid adviserId found in paperData. Returning placeholder.');
+					return "Unknown Adviser";
+				}
+	
+				const adviserRef = doc(db, 'adviser', adviserObj.adviserId);
 				const adviserSnap = await getDoc(adviserRef);
-				const adviserData = adviserSnap.data();
-
-				return adviserData.name;
+	
+				if (adviserSnap.exists()) {
+					const adviserData = adviserSnap.data();
+					return adviserData.name || "Unknown Adviser";
+				} else {
+					console.warn('Adviser document not found. Returning placeholder.');
+					return "Unknown Adviser";
+				}
+			} else {
+				console.warn('Thesis paper not found. Returning placeholder.');
+				return "Unknown Adviser";
 			}
 		} catch (error) {
 			console.error(error);
+			return "Unknown Adviser";
 		}
-	}, 
+	},
 
 	getThesisDetails: async (paperId) => {
 		try {
@@ -449,10 +464,9 @@ export const useThesisStore = create((set) => ({
 				console.log('Fetched paper data:', paperData); // Debugging information
 				
 				// Fetch adviser name
-				const adviserRef = doc(db, 'adviser', paperData.adviserId.adviserId);
-				const adviserSnap = await getDoc(adviserRef);
-				const adviserName = adviserSnap.exists() ? adviserSnap.data().name : 'Unknown Adviser';
-				console.log('Fetched adviser name:', adviserName); // Debugging information
+				const { fetchAdviser } = useThesisStore.getState();
+				const adviserName = await fetchAdviser(paperId) || 'Unknown Adviser';
+				console.log('Fetched adviser name:', adviserName);
 
 				// Fetch student names
 				const studentRef = doc(db, 'student', paperData.studentId);
