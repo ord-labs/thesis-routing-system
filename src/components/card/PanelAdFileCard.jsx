@@ -44,7 +44,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     }, [getPaper]);
 
     useEffect(() => {
-        console.log(paperDetails);
+        console.log(paperDetails?.panelIds);
         
     }, [paperDetails]);
     
@@ -167,12 +167,13 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
         await updateApproveStatus(Cookies.get('role'), Cookies.get('panelId'), paperId, newStatus);
     };
 
-
+    const isAuthorized = Cookies.get('adviserId') !== paperDetails?.adviser?.adviserId || 
+                         Object.values(paperDetails?.panelIds || {}).some(panel => panel.panelId === Cookies.get("panelId"))
+    
     return (
         <div className="w-[90%] md:w-80 flex flex-col items-center border shadow-md rounded-lg">
             <div className="w-full flex justify-end p-2 bg-gray-700 rounded-t-lg">
-                {(Cookies.get('adviserId') === paperDetails?.adviser?.adviserId || 
-                    paperDetails?.panelIds?.some(panel => Cookies.get('panelId') === panel.panelId)) && (
+                {isAuthorized && (
                         <MessageSquare
                             size={30}
                             className="text-white cursor-pointer mx-1"
