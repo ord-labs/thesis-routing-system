@@ -170,14 +170,13 @@ export const useThesisStore = create((set) => ({
 			const thesisRef = await addDoc(collection(db, 'thesisPaper'), thesis);
 			set((state) => ({
 				theses: [
-					{ id: thesisRef.id, ...thesis }, 
+					{ id: thesisRef.id, ...thesis },
 					...state.theses
 				],
 				loading: false,
 			}));
 			return { success: true };
 		} catch (error) {
-			
 			return { success: false, error: error.message };
 		}
 	},
@@ -452,6 +451,19 @@ export const useThesisStore = create((set) => ({
 		} catch (error) {
 			console.error(error);
 			return "Unknown Adviser";
+		}
+	},
+
+	fetchAllAdvisers: async () => {
+		try {
+			const advisersRef = collection(db, 'adviser');
+			const advisersSnapshot = await getDocs(advisersRef);
+			return advisersSnapshot.docs.map((doc) => ({
+				id: doc.id,
+				...doc.data()
+			}))
+		} catch (error) {
+			console.error(error);
 		}
 	},
 
