@@ -1,11 +1,12 @@
 'use client'
 
 import { MessageSquare, FileText, Check, XCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Modal from "../modal/Modal";
 import { useThesisStore } from "../../stores/useThesisStore";
 import { commentModel } from "../../models/commentModel";
 import Cookies from 'js-cookie';
+import { log } from "util";
 
 const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
@@ -15,6 +16,13 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     const [isLoadingComments, setIsLoadingComments] = useState(false);
     const [isApproved, setIsApproved] = useState(false);
     const [thumbnailUrl, setThumbnailUrl] = useState('');
+    const [paperDetails, setPaperDetails] = useState(null);
+    
+
+    const { createThesisComment, updateApproveStatus, getStatus, getThesisComment, getCurrentPaper } = useThesisStore((state) => state);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
         if (pdfUrl) {
@@ -24,6 +32,16 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
         }
     }, [pdfUrl]);
 
+    
+    const getPaper = useCallback(async () => {
+        const paper = await getCurrentPaper(paperId);
+        setPaperDetails(paper);
+    }, [getCurrentPaper, paperId]); 
+    
+    useEffect(() => {
+        getPaper();
+    }, [getPaper]);
+    
     const handleOpenFullComment = (commentItem) => {
         setSelectedComment(commentItem);
     };
@@ -75,13 +93,6 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     const filename = getFilenameFromUrl(pdfUrl);
     const { groupNumber, projectTitle, submittedOn } = extractInfoFromFilename(filename);
 
-    const createThesisComment = useThesisStore((state) => state.createThesisComment);
-    const updateApproveStatus = useThesisStore((state) => state.updateApproveStatus);
-    const getStatus = useThesisStore((state) => state.getStatus); // Using the getStatus function from the store
-
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [successMessage, setSuccessMessage] = useState("");
-
     const handleCommentSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -106,8 +117,6 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
         }
     };
 
-    const getThesisComment = useThesisStore((state) => state.getThesisComment);
-    
     const handleFetchComments = async () => {
         setIsCommentsModalOpen(true);
         setIsLoadingComments(true);
@@ -152,17 +161,20 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
         await updateApproveStatus(Cookies.get('role'), Cookies.get('panelId'), paperId, newStatus);
     };
 
+
     return (
         <div className="w-[90%] md:w-80 flex flex-col items-center border shadow-md rounded-lg">
             <div className="w-full flex justify-end p-2 bg-gray-700 rounded-t-lg">
-                <MessageSquare
-                    size={30}
-                    className="text-white cursor-pointer mx-1"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        handleFetchComments();
-                    }}
-                />
+                {Cookies.get('adviserId') === paperDetails?.adviser?.adviserId && (
+                    <MessageSquare
+                        size={30}
+                        className="text-white cursor-pointer mx-1"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleFetchComments();
+                        }}
+                    />
+                )}
             </div>
 
             {/* Toast Notification */}
