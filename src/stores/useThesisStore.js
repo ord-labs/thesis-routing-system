@@ -220,6 +220,8 @@ export const useThesisStore = create((set) => ({
 		}	
 	},
 
+	
+
 	getThesisComment: async (paperId) => {
 		try {
 			const adviserCollection = collection(db, "adviser");
@@ -495,6 +497,19 @@ export const useThesisStore = create((set) => ({
 			return { adviserName: 'Unknown Adviser', studentNames: [] };
 		}
 	},
+
+	getCurrentPaper: async (paperId) => {
+		try {
+			const paperSnap = await getDoc(doc(db, 'thesisPaper', paperId));
+			if (paperSnap.exists()) {
+				const paperData = paperSnap.data();
+				return paperData;
+			} 
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
 }));
 
 const getStatus = async (thesisId) => {
