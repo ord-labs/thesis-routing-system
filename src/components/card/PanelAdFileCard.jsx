@@ -36,11 +36,17 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     const getPaper = useCallback(async () => {
         const paper = await getCurrentPaper(paperId);
         setPaperDetails(paper);
+        
     }, [getCurrentPaper, paperId]); 
     
     useEffect(() => {
         getPaper();
     }, [getPaper]);
+
+    useEffect(() => {
+        console.log(paperDetails);
+        
+    }, [paperDetails]);
     
     const handleOpenFullComment = (commentItem) => {
         setSelectedComment(commentItem);
@@ -165,16 +171,17 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     return (
         <div className="w-[90%] md:w-80 flex flex-col items-center border shadow-md rounded-lg">
             <div className="w-full flex justify-end p-2 bg-gray-700 rounded-t-lg">
-                {Cookies.get('adviserId') === paperDetails?.adviser?.adviserId && (
-                    <MessageSquare
-                        size={30}
-                        className="text-white cursor-pointer mx-1"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleFetchComments();
-                        }}
-                    />
-                )}
+                {(Cookies.get('adviserId') === paperDetails?.adviser?.adviserId || 
+                    paperDetails?.panel?.some(panel => Cookies.get('panelId') === panel.panelId)) && (
+                        <MessageSquare
+                            size={30}
+                            className="text-white cursor-pointer mx-1"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleFetchComments();
+                            }}
+                        />
+                    )}
             </div>
 
             {/* Toast Notification */}
