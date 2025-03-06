@@ -56,13 +56,15 @@ useEffect(() => {
 // Fetch adviser and student names for this paper
 useEffect(() => {
     const fetchDetails = async () => {
-    const details = await getThesisDetails(paperId);
-    console.log('Fetched details:', details);
-    setAdviserName(details.adviserName);
-    setStudentNames(details.studentNames || []);
+        const details = await getThesisDetails(paperId);
+        console.log('Fetched details:', details.adviserName);
+        setAdviserName(details.adviserName);
+        setStudentNames(details.studentNames || []);
+        
+    console.log('adviserName:', details.adviserName, studentNames)
     };
     fetchDetails();
-}, [getThesisDetails, paperId]);
+}, []);
 
 // Helper to extract filename from the PDF URL
 const getFilenameFromUrl = (url) => {
@@ -137,7 +139,6 @@ const handlePanelAssignment = async () => {
 
 // Current date if needed for debugging or PDF
 const currentDate = new Date().toLocaleDateString();
-console.log('Current date:', currentDate);
 
     return (
         <div className="w-[90%] md:w-80 flex flex-col items-center border shadow-md rounded-lg relative group">
@@ -196,11 +197,11 @@ console.log('Current date:', currentDate);
                 <div className="w-full p-2 text-center">
                     <button
                         onClick={() =>
-                        downloadPDF({
-                            date: new Date().toLocaleDateString(),
-                            adviserName,
-                            studentNames,
-                        })
+                            downloadPDF({
+                                date: new Date().toLocaleDateString(),
+                                adviserName,
+                                studentNames,
+                            })
                         }
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-all"
                     >

@@ -480,14 +480,12 @@ export const useThesisStore = create((set) => ({
 				// Fetch adviser name
 				const { fetchAdviser } = useThesisStore.getState();
 				const adviserName = await fetchAdviser(paperId) || 'Unknown Adviser';
-				console.log('Fetched adviser name:', adviserName);
 
 				// Fetch student names
 				const studentRef = doc(db, 'student', paperData.studentId);
 				const studentSnap = await getDoc(studentRef);
-				const studentNames = studentSnap.exists() ? [studentSnap.data().name] : ['Unknown Student'];
-				console.log('Fetched student names:', studentNames); // Debugging information
-
+				const studentNames = studentSnap.exists() ? [studentSnap.data().members] : ['Unknown Student'];
+				
 				return { adviserName, studentNames };
 			} else {
 				throw new Error('Thesis paper not found');
