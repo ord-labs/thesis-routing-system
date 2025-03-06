@@ -39,6 +39,8 @@ const Page = () => {
 		getCurrentUser,
 		getAdvisers,
 		advisers,
+		loginLoading,
+		setLoginLoading,
 	} = useAuthStore((state) => state);
 
 	const collegeOptions = [
@@ -70,6 +72,7 @@ const Page = () => {
 	};
 
 	const handleRegister = async () => {
+		setLoginLoading(true);
 		const currentUser = getCurrentUser();
 
 		await registerStudent(
@@ -97,6 +100,8 @@ const Page = () => {
 				alert('Invalid email or password.');
 			}
 		});
+
+		setLoginLoading(false);
 	};
 
 	useEffect(() => {
@@ -231,7 +236,12 @@ const Page = () => {
 					onChange={(e) => setSelectedGroupNumber(e.target.value)}
 				/>
 
-				<TRSButton label={'Submit Registration'} onClick={handleRegister} />
+				<TRSButton
+					label={`${
+						loginLoading ? 'Submitting registration...' : 'Submit Registration'
+					}`}
+					onClick={handleRegister}
+				/>
 				<p className="text-center text-sm">
 					Already have an account?{' '}
 					<span>
