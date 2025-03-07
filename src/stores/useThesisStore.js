@@ -137,6 +137,59 @@ export const useThesisStore = create((set) => ({
 		}
 	},
 
+	getAdviserPapers: async (adviserId) => {
+		try {
+			set({ loading: true });
+			const route = useThesisStore.getState().getCurrentRoute();
+
+			const thesisRef = collection(db, 'thesisPaper');
+			
+			const snapshot = await getDocs(query(thesisRef, 
+											where('currRoute', '==', route),
+											where('adviser.adviserId', '==', adviserId)
+										));
+
+			const theses = snapshot.docs.map((doc) => ({
+				id: doc.id,
+				...doc.data(),
+			}))
+			.sort((a, b) => b.createdAt - a.createdAt);
+
+			set({ theses, loading: false });
+
+			return theses;
+
+		} catch (error) {
+			console.error(error)
+			
+		}
+	},
+
+	getPanelPapers: async (panelId) => { 
+		try {
+			set({ loading: true });
+			const route = useThesisStore.getState().getCurrentRoute();
+			const thesisRef = collection(db, 'thesisPaper');
+	
+			const snapshot = await getDocs(query(thesisRef, where('currRoute', '==', route)));
+			const filteredTheses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Convert Firestore docs to objects
+
+			const matchingTheses = filteredTheses.filter(thesis => 
+				thesis.panelIds && Object.values(thesis.panelIds).some(panel => panel.panelId === panelId)
+			);
+	
+			set({ theses: matchingTheses, loading: false });		
+		} catch (error) {
+			console.error("Error fetching panel papers:", error);
+			return [];
+		} finally {
+			set({ loading: false });
+		}
+	},
+	
+	
+	
+	
 	getThesisByStudentAndRoute: async (studentId) => {
 		try {
 			set({ loading: true });

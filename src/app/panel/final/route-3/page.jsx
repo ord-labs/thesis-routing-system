@@ -3,15 +3,15 @@
 import PanelAdFileCard from '../../../../components/card/PanelAdFileCard';
 import { useCallback, useEffect, useState } from 'react';
 import { useThesisStore } from '../../../../stores/useThesisStore';
-
+import Cookies from 'js-cookie'
 const Page = () => {
 	const theses = useThesisStore((state) => state.theses);
 	const loading = useThesisStore((state) => state.loading);
-	const getAllThesis = useThesisStore((state) => state.getAllThesis);
+	const getPanelPapers = useThesisStore((state) => state.getPanelPapers);
 
 	const getThesisPapers = useCallback(async () => {
-		await getAllThesis();
-	}, [getAllThesis]);
+		await getPanelPapers(Cookies.get('panelId')	)
+	}, [getPanelPapers]);
 
 	useEffect(() => {
 		getThesisPapers();
