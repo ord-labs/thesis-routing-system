@@ -23,8 +23,7 @@ const StudentFileCard = ({ pdfUrl, paperId, onDelete }) => {
 
     const toggleMenu = async () => {   
         try {  
-            const fetchedComments = await getThesisComment(paperId ); 
-            console.log(fetchedComments);
+            const fetchedComments = await getThesisComment(paperId );
             
             setComments(Array.isArray(fetchedComments) ? fetchedComments : []);  
         } catch (error) {  

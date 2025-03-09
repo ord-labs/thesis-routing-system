@@ -43,14 +43,20 @@ export const useThesisStore = create((set) => ({
 			if (role === "adviser") {
 				updateData[`adviserId.approved`] = approvedStatus;
 			} else {
-				const panelRef = doc(db, 'panel', docId);
-				const docSnap = await getDoc(panelRef);
+				const paperSnap = await getDoc(paperRef)
+
+				if(!paperSnap.exists()) {
+					throw new Error('Paper not found')
+				}
+
+				let panelIds = paperSnap.data().panelIds;
+
+				if (!panelIds || typeof panelIds !== "object") {
+					panelIds = {}; 
+				}
+				panelIds[docId] = { panelId: docId, approved: approvedStatus };
 	
-				const label = docSnap.data().position.label;
-				const panelNum = parseInt(label.split(' ')[1], 10);
-				
-				updateData[`panelIds.${panelNum - 1}.panelId`] = docId;
-				updateData[`panelIds.${panelNum - 1}.approved`] = approvedStatus;
+				updateData[`panelIds`] = panelIds;
 			} 
 			await updateDoc(paperRef, updateData);
 		} catch (error) {
@@ -87,14 +93,8 @@ export const useThesisStore = create((set) => ({
 				}
 		
 				const panelData = panelSnap.data();
-				const label = panelData.position?.label;
-				if (!label) {
-					throw new Error('Panel position label not found');
-				}
-				const panelNum = parseInt(label.split(' ')[1], 10);
 		
-				// Return the approved status from the corresponding panelIds array
-				return paperData.panelIds?.[panelNum - 1]?.approved;
+				return paperData.panelIds?.[docId]?.approved;
 			}
 		} catch (error) {
 			console.error("Error fetching approved status:", error);
@@ -437,15 +437,15 @@ export const useThesisStore = create((set) => ({
 
 					// Update each panel ID
 					panelIds.forEach((panelId, index) => {
-						updateData[`panelIds.${panelNum - 1 + index}.panelId`] = panelId;
-						updateData[`panelIds.${panelNum - 1 + index}.approved`] = false;
+						updateData[`panelIds.${panelId}.panelId`] = panelId;
+						updateData[`panelIds.${panelId}.approved`] = false;
 					});
 				}
 			} else {
 				// Fallback: use first panel's index
 				panelIds.forEach((panelId, index) => {
-					updateData[`panelIds.${index}.panelId`] = panelId;
-					updateData[`panelIds.${index}.approved`] = false;
+					updateData[`panelIds.${panelId}.panelId`] = panelId;
+					updateData[`panelIds.${panelId}.approved`] = false;
 				});
 			}
 			await updateDoc(paperRef, updateData);			
@@ -554,6 +554,14 @@ export const useThesisStore = create((set) => ({
 			const paperSnap = await getDoc(doc(db, 'thesisPaper', paperId));
 			if (paperSnap.exists()) {
 				const paperData = paperSnap.data();
+				const studentId = paperData.studentId;
+
+				const studentSnap = await getDoc(doc(db, 'student', studentId));
+				
+				if (studentSnap.exists()) {
+					const groupNumber = studentSnap.data().groupNumber;
+					return { ...paperData, groupNumber: groupNumber };
+				}
 				return paperData;
 			} 
 		} catch (error) {
@@ -562,24 +570,3 @@ export const useThesisStore = create((set) => ({
 	}
 
 }));
-
-const getStatus = async (thesisId) => {
-	try {
-		const thesisDoc = await getDoc(doc(db, 'theses', thesisId));
-		const thesis = thesisDoc.data();
-
-		if (!thesis) {
-			throw new Error('Thesis not found');
-		}
-
-		const status = thesis.status;
-		if (!status) {
-			throw new Error('Status not found');
-		}
-
-		return status;
-	} catch (error) {
-		console.error('Error fetching approved status:', error.message);
-		throw error;
-	}
-};
