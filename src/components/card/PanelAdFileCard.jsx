@@ -74,15 +74,14 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
         }
     
         // Default values
-        let groupNumber = 'Unknown Group';
-        let projectTitle = 'Untitled Project';
+        let groupNumber = paperDetails?.groupNumber;
+        let projectTitle = paperDetails?.title;
         let submittedOn = new Date().toISOString().split('T')[0];
     
         // Extracting Info
         if (parts.length >= 3) {
             // Format: Group1_ProjectTitle_Date
             // Example: Group1_ESP32WiFiServers_2025-01-25.pdf
-            groupNumber = parts[0];
             projectTitle = parts.slice(1, -1).join(' ');
     
             // Try to parse the last part as a date
@@ -147,6 +146,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                     throw new Error('Missing required parameters');
                 }
                 const status = await getStatus(role, panelId, paperId);
+                
                 setIsApproved(status ?? false); // Default to false if null
             } catch (error) {
                 console.error('Error fetching approval status:', error.message);
@@ -272,7 +272,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
                             onClick={() => handleOpenFullComment(commentItem)}
                         >
                             <p className="font-bold">
-                            {commentItem.position?.label || commentItem.name}
+                            {commentItem.name}
                             </p>
                             <p className="break-words line-clamp-3">
                             {commentItem.comment}
