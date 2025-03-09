@@ -5,8 +5,17 @@ import dynamic from "next/dynamic";
 import CertificateOfEndorsement from "../../../../components/pdf/CertificateOfEndorsement";
 
 // Dynamically import PDF components to avoid SSR issues
-const PDFViewer = dynamic(() => import("@react-pdf/renderer").then((mod) => mod.PDFViewer), { ssr: false });
-const PDFDownloadLink = dynamic(() => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink), { ssr: false });
+
+const PDFViewer = dynamic(async () => {
+  const mod = await import("@react-pdf/renderer");
+  return mod.PDFViewer;
+}, { ssr: false });
+
+const PDFDownloadLink = dynamic(async () => {
+  const mod = await import("@react-pdf/renderer");
+  return mod.PDFDownloadLink;
+}, { ssr: false });
+
 
 const Page = () => {
   const currentDate = new Date().toLocaleDateString();
