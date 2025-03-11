@@ -29,6 +29,7 @@ const SubmitFile = () => {
   const [advisers, setAdvisers] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [chosenAdviser, setChosenAdviser] = useState({});
+  const [isAdviserChosen, setIsadviserChosen] = useState(false);  
 
   const route = useThesisStore((state) => state.getCurrentRoute());
   const { createThesis, fetchAllAdvisers } = useThesisStore((state) => state);
@@ -66,6 +67,7 @@ const SubmitFile = () => {
       setUploading(false);
       setIsModalOpen(false);
       setChosenAdviser({});
+      setIsadviserChosen(false)
     } catch (error) {
       console.error("Error uploading file:", error);
       setUploading(false);
@@ -92,10 +94,11 @@ const SubmitFile = () => {
           setIsModalOpen(false);
           setChosenAdviser({});
           setUploading(false);
+          setIsadviserChosen(false)
         }}
       >
         <div className="flex flex-col">
-          <h2 className="text-xl font-bold mb-3">Choose Adviser</h2>
+          <h2 className="text-xl font-bold mb-3">Choose Adviser before uploading</h2>
           
           <h2 className="text-md font-bold text-red-600 my-2">Follow Naming Convention <br /> Ex: Group1_ESP32WifiServers_2025-03-01.pdf</h2>
           <div className="flex flex-col gap-4 my-5 max-h-68 overflow-y-auto">
@@ -104,7 +107,10 @@ const SubmitFile = () => {
                 className={`${
                   chosenAdviser.id === adviser.id ? "bg-gray-400" : "bg-gray-600"
                 } transition-colors duration-500 ease-in-out cursor-pointer w-full p-4 rounded-lg`}
-                onClick={() => setChosenAdviser(adviser)}
+                onClick={() => {
+                  setChosenAdviser(adviser); 
+                  setIsadviserChosen(true);
+                }}
                 key={adviser.id}
               >
                 {adviser.name}
@@ -122,9 +128,9 @@ const SubmitFile = () => {
             />
             <button
               onClick={() => ikUploadRef.current.click()}
-              className="bg-blue-600 font-bold text-lg hover:bg-blue-800 w-full rounded-lg p-4"
+              className={` font-bold text-lg ${isAdviserChosen ? 'bg-blue-600  cursor-pointer' : ' bg-blue-900 pointer-events-none '}  w-full rounded-lg p-4`}
               type="button"
-              disabled={uploading}
+              disabled={uploading || !isAdviserChosen}
             >
               {uploading ? "Uploading..." : "Upload File"}
             </button>

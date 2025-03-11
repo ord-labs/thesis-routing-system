@@ -61,8 +61,7 @@ const styles = StyleSheet.create({
 });
 
 const CertificateOfEndorsement = ({ date = '', adviserName = 'Unknown Adviser', studentNames = [] }) => {
-  console.log('Rendering CertificateOfEndorsement with:', { date, adviserName, studentNames }); // Debugging information
-
+  
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -94,19 +93,19 @@ const CertificateOfEndorsement = ({ date = '', adviserName = 'Unknown Adviser', 
           </Text>
         </View>
         <View style={[styles.section, { flexDirection: "column", alignItems: "flex-start" }]}>
-  <Text>Researchers:</Text>
-  <View style={{ marginTop: 10 }}>
-    {studentNames.length > 0 && Array.isArray(studentNames[0]) ? (
-      studentNames[0].map((name, index) => (
-        <Text key={index} style={{ marginBottom: 5 }}>
-          {index + 1}. {name}
-        </Text>
-      ))
-    ) : (
-      <Text>No researchers found.</Text>
-    )}
-  </View>
-</View>
+          <Text>Researchers:</Text>
+          <View style={{ marginTop: 10 }}>
+            {studentNames.length > 0 ? (
+              studentNames.map((name, index) => (
+                <Text key={index} style={{ marginBottom: 5 }}>
+                  {index + 1}. {name}
+                </Text>
+              ))
+            ) : (
+              <Text>No researchers found.</Text>
+            )}
+          </View>
+        </View>
 
 
 
