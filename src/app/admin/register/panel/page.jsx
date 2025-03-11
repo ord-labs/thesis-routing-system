@@ -19,6 +19,7 @@ const Page = () => {
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [department, setDepartment] = useState('');
 	const [position, setPosition] = useState('');
+	const [registerLoading, setRegisterLoading] = useState(false);
 
 	const { registerPanel } = useAuthStore((state) => state);
 	const departmentOptions = [
@@ -37,6 +38,7 @@ const Page = () => {
 	];
 
 	const handleRegister = async () => {
+		setRegisterLoading(true);
 		await registerPanel(idnumber, password, 
 			panelModel(
 				idnumber,
@@ -45,7 +47,14 @@ const Page = () => {
 				position,
 			)
 		);
-		router.push('/admin/proposal/route-1');
+		setRegisterLoading(false);
+		setIdnumber(''); // Clear fields
+		setName('');
+		setPassword('');
+		setConfirmPassword('');
+		setDepartment(''); // Clear select option
+		setPosition(''); // Clear select option
+		router.push('/admin/register/panel'); // Move this line after clearing fields
 	};
 
 	return (
@@ -58,10 +67,16 @@ const Page = () => {
 					<TRSInput label="Password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} type="password" />
 					<TRSInput label="Confirm Password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type="password" />
 					<TRSInput label="Complete Name" placeholder="Enter your Complete Name" value={name} onChange={(e) => setName(e.target.value)} />
-					<TRSDropdown label="College" options={departmentOptions} onSelect={setDepartment} />
-					<TRSDropdown label="Position" options={positionOptions} onSelect={setPosition} />
+					<TRSDropdown label="College" options={departmentOptions} onSelect={setDepartment} value={department} /> {/* Ensure the value is controlled */}
+					<TRSDropdown label="Position" options={positionOptions} onSelect={setPosition} value={position} /> {/* Ensure the value is controlled */}
 
-					<TRSButton label="Submit Registration" onClick={handleRegister} />
+					<div className="mt-6 text-center">
+						<TRSButton 
+							label={`${registerLoading ? 'Submitting....' : 'Submit Register'}`} 
+							onClick={handleRegister} 
+							className="w-full bg-smccprimary text-white py-2 rounded-lg hover:bg-blue-700 transition hover:shadow-lg"
+						/>
+					</div>
 				</div>
 			</div>
 		</>

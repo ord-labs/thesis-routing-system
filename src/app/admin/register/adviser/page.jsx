@@ -15,10 +15,12 @@ const Page = () => {
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [department, setDepartment] = useState('');
+	const [registerLoading, setRegisterLoading] = useState(false);
 
 	const { registerAdviser } = useAuthStore((state) => state);
 
 	const departmentOptions = [
+		{ value: '', label: 'Select an Option' }, // Default option
 		{ value: 'CTHM', label: 'College of Tourism, Hospitality, Business, and Management' },
 		{ value: 'CTE', label: 'College of Teacher Education' },
 		{ value: 'CAS', label: 'College of Arts and Sciences' },
@@ -27,6 +29,7 @@ const Page = () => {
 	];
 
 	const handleRegister = async () => {
+		setRegisterLoading(true);
 		await registerAdviser(idnumber, password, 
 			adviserModel(
 				idnumber,
@@ -34,7 +37,13 @@ const Page = () => {
 				department,
 			)
 		);
-		router.push('/admin/proposal/route-1');
+		setRegisterLoading(false);
+		setIdnumber(''); // Clear fields
+		setName('');
+		setPassword('');
+		setConfirmPassword('');
+		setDepartment(''); // Clear select option
+		router.push('/admin/register/adviser'); // Move this line after clearing fields
 	};
 
 	return (
@@ -74,14 +83,15 @@ const Page = () => {
 							label="College" 
 							options={departmentOptions} 
 							onSelect={setDepartment} 
+							value={department} // Ensure the value is controlled
 						/>
 					</div>
 
-					<div className="mt-6">
+					<div className="mt-6 text-center">
 						<TRSButton 
-							label="Submit Registration" 
+							label={`${registerLoading ? 'Submitting....' : 'Submit Register'}`} 
 							onClick={handleRegister} 
-							className="w-full bg-smccprimary text-white py-2 rounded-lg hover:bg-blue-700 transition hover:shadow-lg"
+							className="w-full bg-smccprimary text-white py-2 rounded-lg hover:bg-blue-700 transition hover:shadow-lg mx-auto"
 						/>
 					</div>
 				</div>
