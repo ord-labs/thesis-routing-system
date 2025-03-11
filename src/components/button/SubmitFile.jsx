@@ -1,89 +1,144 @@
-import { IKUpload, ImageKitProvider } from "imagekitio-next"
-import { useRef } from "react";
+import { IKUpload, ImageKitProvider } from "imagekitio-next";
+import { useCallback, useEffect, useRef, useState } from "react";
 import TRSButton from "./TRSButton";
 import { FileUp } from "lucide-react";
 import { useThesisStore } from "../../stores/useThesisStore";
 import { thesisModel } from "../../models/thesisModel";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
+import Modal from "../modal/Modal";
 
 const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT;
 const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY;
 
-  
 const authenticator = async () => {
   try {
-    const response = await fetch("https://thesis-routing-system.netlify.app/api/auth");
-
+    const response = await fetch("http://localhost:3000/api/auth");
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Request failed with status ${response.status}: ${errorText}`);
     }
-
     const data = await response.json();
-    const { signature, expire, token } = data;
-    return { signature, expire, token };
+    return { signature: data.signature, expire: data.expire, token: data.token };
   } catch (error) {
     throw new Error(`Authentication request failed: ${error.message}`);
   }
 };
 
 const SubmitFile = () => {
-  const createThesis = useThesisStore((state) => state.createThesis);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [advisers, setAdvisers] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [chosenAdviser, setChosenAdviser] = useState({});
+  const [isAdviserChosen, setIsadviserChosen] = useState(false);  
+
   const route = useThesisStore((state) => state.getCurrentRoute());
-  const getAllThesis = useThesisStore((state) => state.getAllThesis);
-  
+  const { createThesis, fetchAllAdvisers } = useThesisStore((state) => state);
+
+  const fetchAdvisers = useCallback(async () => {
+    const fetchedAd = await fetchAllAdvisers();
+    setAdvisers(fetchedAd);
+  }, [fetchAllAdvisers]);
+
+  useEffect(() => {
+    fetchAdvisers();
+  }, [isModalOpen]);
+
   const onError = (err) => {
-    console.log("Error", err);
+    console.error("Upload Error:", err);
+    setUploading(false);
   };
 
   const onSuccess = async (res) => {
-    console.log("Success", res);
-
+    console.log("Upload success:", res);
     try {
       await createThesis(
         thesisModel(
-          res.name, 
+          res.name,
           res.url,
-          Cookies.get('studentId'),
-          [
-            {
-            panelId: 'panelId1',
-            approved: false
-            },
-            {
-              panelId: 'panelId2',
-              approved: false
-            },
-            {
-              panelId: 'panelId3',
-              approved: false
-            },
-            {
-              panelId: 'panelId4',
-              approved: false
-            }, 
-          ],
+          Cookies.get("studentId"),
+          [],
           {
-            adviserId: 'adviserId123',
-            approved: false
+            adviserId: chosenAdviser.id,
+            name: chosenAdviser.name,
           },
-          route,
+          route
         )
       );
-
+      setUploading(false);
+      setIsModalOpen(false);
+      setChosenAdviser({});
+      setIsadviserChosen(false)
     } catch (error) {
-      console.error(error);
+      console.error("Error uploading file:", error);
+      setUploading(false);
     }
   };
 
-  const ikUploadRef = useRef(null)
-  
-    return (
-        <ImageKitProvider publicKey={publicKey} urlEndpoint={urlEndpoint} authenticator={authenticator}>
-            <IKUpload style={{ display: "none"}} useUniqueFileName onError={onError} onSuccess={onSuccess} ref={ikUploadRef}/>
-            <TRSButton onClick={() => ikUploadRef.current.click()} label={<FileUp />} />
-        </ImageKitProvider>
-    )
-}
+  const ikUploadRef = useRef(null);
 
-export default SubmitFile
+  const onFileSelect = () => {
+    setUploading(true);
+    setTimeout(() => {
+      if (ikUploadRef.current) {
+        ikUploadRef.current.click(); 
+      }
+    }, 100); 
+  };
+
+  return (
+    <div>
+      <TRSButton onClick={() => setIsModalOpen(true)} label={<FileUp />} />
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setChosenAdviser({});
+          setUploading(false);
+          setIsadviserChosen(false)
+        }}
+      >
+        <div className="flex flex-col">
+          <h2 className="text-xl font-bold mb-3">Choose Adviser before uploading</h2>
+          
+          <h2 className="text-md font-bold text-red-600 my-2">Follow Naming Convention <br /> Ex: Group1_ESP32WifiServers_2025-03-01.pdf</h2>
+          <div className="flex flex-col gap-4 my-5 max-h-68 overflow-y-auto">
+            {advisers.map((adviser) => (
+              <div
+                className={`${
+                  chosenAdviser.id === adviser.id ? "bg-gray-400" : "bg-gray-600"
+                } transition-colors duration-500 ease-in-out cursor-pointer w-full p-4 rounded-lg`}
+                onClick={() => {
+                  setChosenAdviser(adviser); 
+                  setIsadviserChosen(true);
+                }}
+                key={adviser.id}
+              >
+                {adviser.name}
+              </div>
+            ))}
+          </div>
+          <ImageKitProvider publicKey={publicKey} urlEndpoint={urlEndpoint} authenticator={authenticator}>
+            <IKUpload
+              style={{ display: "none" }}
+              useUniqueFileName
+              onError={onError}
+              onSuccess={onSuccess}
+              ref={ikUploadRef}
+              onChange={onFileSelect} 
+            />
+            <button
+              onClick={() => ikUploadRef.current.click()}
+              className={` font-bold text-lg ${isAdviserChosen ? 'bg-blue-600  cursor-pointer' : ' bg-blue-900 pointer-events-none '}  w-full rounded-lg p-4`}
+              type="button"
+              disabled={uploading || !isAdviserChosen}
+            >
+              {uploading ? "Uploading..." : "Upload File"}
+            </button>
+          </ImageKitProvider>
+        </div>
+      </Modal>
+    </div>
+  );
+};
+
+export default SubmitFile;

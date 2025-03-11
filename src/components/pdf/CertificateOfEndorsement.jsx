@@ -1,3 +1,5 @@
+'use client'
+
 import React from "react";
 import {
   Document,
@@ -59,8 +61,7 @@ const styles = StyleSheet.create({
 });
 
 const CertificateOfEndorsement = ({ date = '', adviserName = 'Unknown Adviser', studentNames = [] }) => {
-  console.log('Rendering CertificateOfEndorsement with:', { date, adviserName, studentNames }); // Debugging information
-
+  
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -91,17 +92,24 @@ const CertificateOfEndorsement = ({ date = '', adviserName = 'Unknown Adviser', 
             in the degree of Bachelor of Science in Information Technology.
           </Text>
         </View>
-
-        <View style={styles.section}>
+        <View style={[styles.section, { flexDirection: "column", alignItems: "flex-start" }]}>
           <Text>Researchers:</Text>
-          {studentNames.length > 0 ? (
-            studentNames.map((name, index) => (
-              <Text key={index}>{index + 1}. {name}</Text>
-            ))
-          ) : (
-            <Text>No researchers found.</Text>
-          )}
+          <View style={{ marginTop: 10 }}>
+            {studentNames.length > 0 ? (
+              studentNames.map((name, index) => (
+                <Text key={index} style={{ marginBottom: 5 }}>
+                  {index + 1}. {name}
+                </Text>
+              ))
+            ) : (
+              <Text>No researchers found.</Text>
+            )}
+          </View>
         </View>
+
+
+
+
 
         <View style={styles.section}>
           <Text>
@@ -112,8 +120,24 @@ const CertificateOfEndorsement = ({ date = '', adviserName = 'Unknown Adviser', 
         </View>
 
         <View style={styles.signatureSection}>
-          <Text>Endorsed by:</Text>
-          <Text>____________________________</Text>
+          <View style={{ marginBottom: 10 }}>
+            <Text>Endorsed by:</Text>
+            <Text 
+              style={{ 
+                borderBottomWidth: 1, 
+                borderBottomColor: "black", 
+                textAlign: "center", 
+                marginTop: 7, 
+                width: "auto", // Allow dynamic width
+                minWidth: 80, // Set a minimum width to avoid very short underlines
+                alignSelf: "flex-start", // Align dynamically
+              }}
+            >
+              {adviserName}
+            </Text>
+          </View>
+
+
           <Text>Capstone Adviser</Text>
           <Text>{date}</Text>
         </View>
