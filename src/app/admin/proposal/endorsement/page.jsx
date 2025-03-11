@@ -5,7 +5,8 @@ import dynamic from "next/dynamic";
 import CertificateOfEndorsement from "../../../../components/pdf/CertificateOfEndorsement";
 
 // Dynamically import PDF components to avoid SSR issues
-import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
+const PDFViewer = dynamic(async () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer), { ssr: false });
+const PDFDownloadLink = dynamic(async () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink), { ssr: false });
 
 
 const Page = () => {

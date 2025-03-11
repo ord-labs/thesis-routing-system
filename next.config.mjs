@@ -10,7 +10,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-    serverComponents: false,
+    serverActions: true,
     // esmExternals: "loose", 
   },
   // webpack: (config) => {
