@@ -47,7 +47,6 @@ useEffect(() => {
 useEffect(() => {
     const fetchStatus = async () => {
     const statusData = await getThesisStatus(paperId);
-    console.log('Fetched status:', statusData);
     setStatus(statusData);
     };
     fetchStatus();
@@ -57,11 +56,8 @@ useEffect(() => {
 useEffect(() => {
     const fetchDetails = async () => {
         const details = await getThesisDetails(paperId);
-        console.log('Fetched details:', details.adviserName);
         setAdviserName(details.adviserName);
-        setStudentNames(details.studentNames || []);
-        
-    console.log('adviserName:', details.adviserName, studentNames)
+        setStudentNames([...details.allMembers]);
     };
     fetchDetails();
 }, []);

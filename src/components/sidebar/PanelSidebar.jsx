@@ -34,10 +34,8 @@ const PanelSidebar = () => {
       const getUser = async () => {
         const role = Cookies.get('role');
         const panelId = Cookies.get('panelId');
-        console.log(role, panelId);
         
         const currentUser = await getUserDetails(role, panelId);
-        console.log('currentusername: ', currentUser);
         
         setUserDetails({
           name: currentUser.name,

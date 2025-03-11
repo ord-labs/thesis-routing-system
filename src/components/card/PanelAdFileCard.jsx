@@ -42,11 +42,6 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
     useEffect(() => {
         getPaper();
     }, [getPaper]);
-
-    useEffect(() => {
-        console.log(paperDetails?.panelIds);
-        
-    }, [paperDetails]);
     
     const handleOpenFullComment = (commentItem) => {
         setSelectedComment(commentItem);

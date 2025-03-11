@@ -35,7 +35,6 @@ const StudentSidebar = () => {
       const studentId = Cookies.get('studentId');
 
       const currentUser = await getUserDetails(role, studentId);
-      console.log(currentUser);
       
       setUserDetails({
         name: currentUser.name,

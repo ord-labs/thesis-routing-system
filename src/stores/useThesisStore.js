@@ -295,7 +295,6 @@ export const useThesisStore = create((set) => ({
 				const panelIdsArray = Object.values(data.panelIds); 
 
 				panelIds = Array.isArray(panelIdsArray) ? data.panelIds : []; 
-				console.log(panelIds);
 				
 			}
 			 else {
@@ -358,7 +357,6 @@ export const useThesisStore = create((set) => ({
 			});
 
 			const allComments = [...sortedPanels, ...matchingAdvisers];
-			console.log(allComments);
 			return allComments;
 
 		} catch (error) {
@@ -382,17 +380,12 @@ export const useThesisStore = create((set) => ({
 			const paperSnap = await getDoc(paperRef);
 			if (paperSnap.exists()) {
 				const paperData = paperSnap.data();
-				console.log('Fetched paper data:', paperData); // Debugging information
-				
+
 				const adviserApproved = paperData.adviserId?.approved;
-				const panelIds = Array.isArray(paperData.panelIds) ? paperData.panelIds : [];
-				const panelApproved = panelIds.every(panel => panel.approved);
-				
-				console.log('Adviser approved:', adviserApproved); // Debugging information
-				console.log('Panel approved:', panelApproved); // Debugging information
-				
-				const status = adviserApproved && panelApproved ? 'approved' : 'not approved';
-				console.log('Computed status:', status); // Debugging information
+				const panelIds = paperData.panelIds;
+				const allApproved = Object.values(panelIds).length > 0 && Object.values(panelIds).every(panel => panel.approved);
+
+				const status = allApproved ? 'approved' : 'not approved';
 				return status;
 			} else {
 				throw new Error('Thesis paper not found');
@@ -461,7 +454,6 @@ export const useThesisStore = create((set) => ({
 
 			if (paperSnap.exists()) {
 				const paperData = paperSnap.data();
-				console.log('paperData: ', paperData);
 				
 				// ang e return ani is ang mga panelIds sa thesisPaper 
 				// to access the panelid kay paperData.panelIds.panelId
@@ -483,15 +475,17 @@ export const useThesisStore = create((set) => ({
 			if (paperSnap.exists()) {
 				const paperData = paperSnap.data();
 				
-				const adviserObj = paperData?.adviserId;
-				if (!adviserObj || !adviserObj.adviserId) {
-					console.warn('No valid adviserId found in paperData. Returning placeholder.');
-					return "Unknown Adviser";
-				}
-	
+				const adviserObj = paperData?.adviser;
+				
+				// if (!adviserObj || !adviserObj.adviser) {
+				// 	console.warn('No valid adviserId found in paperData. Returning placeholder.');
+				// 	return "Unknown Adviser";
+				// }
+				
 				const adviserRef = doc(db, 'adviser', adviserObj.adviserId);
+				
 				const adviserSnap = await getDoc(adviserRef);
-	
+				
 				if (adviserSnap.exists()) {
 					const adviserData = adviserSnap.data();
 					return adviserData.name || "Unknown Adviser";
@@ -528,7 +522,6 @@ export const useThesisStore = create((set) => ({
 			const paperSnap = await getDoc(paperRef);
 			if (paperSnap.exists()) {
 				const paperData = paperSnap.data();
-				console.log('Fetched paper data:', paperData); // Debugging information
 				
 				// Fetch adviser name
 				const { fetchAdviser } = useThesisStore.getState();
@@ -537,9 +530,10 @@ export const useThesisStore = create((set) => ({
 				// Fetch student names
 				const studentRef = doc(db, 'student', paperData.studentId);
 				const studentSnap = await getDoc(studentRef);
-				const studentNames = studentSnap.exists() ? [studentSnap.data().members] : ['Unknown Student'];
+				const studentNames = studentSnap.exists() ? studentSnap.data().members : 'Unknown Student';
+				const leaderName = studentSnap.exists() ? studentSnap.data().name: 'Unknown Leader';
 				
-				return { adviserName, studentNames };
+				return { adviserName, allMembers: [leaderName, ...studentNames] };
 			} else {
 				throw new Error('Thesis paper not found');
 			}
