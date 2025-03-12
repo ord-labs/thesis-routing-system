@@ -38,23 +38,35 @@ const Page = () => {
 	];
 
 	const handleRegister = async () => {
+		if (password !== confirmPassword) {
+			alert('Passwords do not match');
+			return;
+		}
+		if (!idnumber || !name || !password || !confirmPassword || !department || !position) {
+			alert('Please fill in all fields');
+			return;
+		}
 		setRegisterLoading(true);
-		await registerPanel(idnumber, password, 
-			panelModel(
-				idnumber,
-				name,
-				department,
-				position,
-			)
-		);
+		try {
+			await registerPanel(idnumber, password, 
+				panelModel(
+					idnumber,
+					name,
+					department,
+					position,
+				)
+			);
+			setIdnumber('');
+			setName('');
+			setPassword('');
+			setConfirmPassword('');
+			setDepartment('');
+			setPosition('');
+			router.push('/admin/register/panel');
+		} catch (error) {
+			alert(`Registration Error: ${error.message}`);
+		}
 		setRegisterLoading(false);
-		setIdnumber(''); // Clear fields
-		setName('');
-		setPassword('');
-		setConfirmPassword('');
-		setDepartment(''); // Clear select option
-		setPosition(''); // Clear select option
-		router.push('/admin/register/panel'); // Move this line after clearing fields
 	};
 
 	return (

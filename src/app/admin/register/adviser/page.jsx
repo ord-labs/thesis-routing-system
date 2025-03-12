@@ -20,7 +20,6 @@ const Page = () => {
 	const { registerAdviser } = useAuthStore((state) => state);
 
 	const departmentOptions = [
-		{ value: '', label: 'Select an Option' }, // Default option
 		{ value: 'CTHM', label: 'College of Tourism, Hospitality, Business, and Management' },
 		{ value: 'CTE', label: 'College of Teacher Education' },
 		{ value: 'CAS', label: 'College of Arts and Sciences' },
@@ -29,21 +28,33 @@ const Page = () => {
 	];
 
 	const handleRegister = async () => {
+		if (password !== confirmPassword) {
+			alert('Passwords do not match');
+			return;
+		}
+		if (!idnumber || !name || !password || !confirmPassword || !department) {
+			alert('Please fill in all fields');
+			return;
+		}
 		setRegisterLoading(true);
-		await registerAdviser(idnumber, password, 
-			adviserModel(
-				idnumber,
-				name,
-				department,
-			)
-		);
+		try {
+			await registerAdviser(idnumber, password, 
+				adviserModel(
+					idnumber,
+					name,
+					department,
+				)
+			);
+			setIdnumber('');
+			setName('');
+			setPassword('');
+			setConfirmPassword('');
+			setDepartment('');
+			router.push('/admin/register/adviser');
+		} catch (error) {
+			alert(`Registration Error: ${error.message}`);
+		}
 		setRegisterLoading(false);
-		setIdnumber(''); // Clear fields
-		setName('');
-		setPassword('');
-		setConfirmPassword('');
-		setDepartment(''); // Clear select option
-		router.push('/admin/register/adviser'); // Move this line after clearing fields
 	};
 
 	return (
