@@ -15,6 +15,7 @@ const Page = () => {
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [department, setDepartment] = useState('');
+	const [registerLoading, setRegisterLoading] = useState(false);
 
 	const { registerAdviser } = useAuthStore((state) => state);
 
@@ -27,14 +28,33 @@ const Page = () => {
 	];
 
 	const handleRegister = async () => {
-		await registerAdviser(idnumber, password, 
-			adviserModel(
-				idnumber,
-				name,
-				department,
-			)
-		);
-		router.push('/admin/proposal/route-1');
+		if (password !== confirmPassword) {
+			alert('Passwords do not match');
+			return;
+		}
+		if (!idnumber || !name || !password || !confirmPassword || !department) {
+			alert('Please fill in all fields');
+			return;
+		}
+		setRegisterLoading(true);
+		try {
+			await registerAdviser(idnumber, password, 
+				adviserModel(
+					idnumber,
+					name,
+					department,
+				)
+			);
+			setIdnumber('');
+			setName('');
+			setPassword('');
+			setConfirmPassword('');
+			setDepartment('');
+			router.push('/admin/register/adviser');
+		} catch (error) {
+			alert(`Registration Error: ${error.message}`);
+		}
+		setRegisterLoading(false);
 	};
 
 	return (
@@ -74,14 +94,15 @@ const Page = () => {
 							label="College" 
 							options={departmentOptions} 
 							onSelect={setDepartment} 
+							value={department} // Ensure the value is controlled
 						/>
 					</div>
 
-					<div className="mt-6">
+					<div className="mt-6 text-center">
 						<TRSButton 
-							label="Submit Registration" 
+							label={`${registerLoading ? 'Submitting....' : 'Submit Register'}`} 
 							onClick={handleRegister} 
-							className="w-full bg-smccprimary text-white py-2 rounded-lg hover:bg-blue-700 transition hover:shadow-lg"
+							className="w-full bg-smccprimary text-white py-2 rounded-lg hover:bg-blue-700 transition hover:shadow-lg mx-auto"
 						/>
 					</div>
 				</div>

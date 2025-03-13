@@ -19,6 +19,7 @@ const Page = () => {
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [department, setDepartment] = useState('');
 	const [position, setPosition] = useState('');
+	const [registerLoading, setRegisterLoading] = useState(false);
 
 	const { registerPanel } = useAuthStore((state) => state);
 	const departmentOptions = [
@@ -37,15 +38,35 @@ const Page = () => {
 	];
 
 	const handleRegister = async () => {
-		await registerPanel(idnumber, password, 
-			panelModel(
-				idnumber,
-				name,
-				department,
-				position,
-			)
-		);
-		router.push('/admin/proposal/route-1');
+		if (password !== confirmPassword) {
+			alert('Passwords do not match');
+			return;
+		}
+		if (!idnumber || !name || !password || !confirmPassword || !department || !position) {
+			alert('Please fill in all fields');
+			return;
+		}
+		setRegisterLoading(true);
+		try {
+			await registerPanel(idnumber, password, 
+				panelModel(
+					idnumber,
+					name,
+					department,
+					position,
+				)
+			);
+			setIdnumber('');
+			setName('');
+			setPassword('');
+			setConfirmPassword('');
+			setDepartment('');
+			setPosition('');
+			router.push('/admin/register/panel');
+		} catch (error) {
+			alert(`Registration Error: ${error.message}`);
+		}
+		setRegisterLoading(false);
 	};
 
 	return (
@@ -58,10 +79,16 @@ const Page = () => {
 					<TRSInput label="Password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} type="password" />
 					<TRSInput label="Confirm Password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type="password" />
 					<TRSInput label="Complete Name" placeholder="Enter your Complete Name" value={name} onChange={(e) => setName(e.target.value)} />
-					<TRSDropdown label="College" options={departmentOptions} onSelect={setDepartment} />
-					<TRSDropdown label="Position" options={positionOptions} onSelect={setPosition} />
+					<TRSDropdown label="College" options={departmentOptions} onSelect={setDepartment} value={department} /> {/* Ensure the value is controlled */}
+					<TRSDropdown label="Position" options={positionOptions} onSelect={setPosition} value={position} /> {/* Ensure the value is controlled */}
 
-					<TRSButton label="Submit Registration" onClick={handleRegister} />
+					<div className="mt-6 text-center">
+						<TRSButton 
+							label={`${registerLoading ? 'Submitting....' : 'Submit Register'}`} 
+							onClick={handleRegister} 
+							className="w-full bg-smccprimary text-white py-2 rounded-lg hover:bg-blue-700 transition hover:shadow-lg"
+						/>
+					</div>
 				</div>
 			</div>
 		</>
