@@ -73,11 +73,15 @@ const AdminSidebar = () => {
 		<>
 			{/* Mobile menu button */}
 			<button
-				className="md:hidden fixed left-4 top-4 z-50 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white"
+				className="md:hidden fixed left-4 top-4 z-50 p-2 rounded-lg bg-smccprimary text-white"
 				onClick={() => setIsOpen(!isOpen)}
 				aria-label="Toggle Sidebar"
 			>
-				{isOpen ? <X size={24} /> : <Menu size={24} />}
+				{isOpen ? (
+					<X size={24} className="bg-smccprimary" />
+				) : (
+					<Menu size={24} className="bg-smccprimary" />
+				)}
 			</button>
 
 			{/* Backdrop for mobile */}
