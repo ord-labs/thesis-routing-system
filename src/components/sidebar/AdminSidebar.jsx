@@ -90,19 +90,19 @@ const AdminSidebar = () => {
 
 			{/* Sidebar */}
 			<div
-				className={`fixed md:relative w-64 h-screen bg-gray-800 flex flex-col border-r border-gray-700 transform transition-transform duration-200 ease-in-out z-50 ${
+				className={`fixed md:relative w-64 h-screen bg-white flex flex-col border-r border-gray-300 transform transition-transform duration-200 ease-in-out z-50 ${
 					isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
 				}`}
 			>
 				{/* Profile Section */}
-				<div className="p-4 border-b border-gray-700">
+				<div className="p-4 border-b border-gray-300">
 					<div className="flex items-center space-x-3">
-						<div className="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center">
+						<div className="h-10 w-10 rounded-full bg-smccprimary flex items-center justify-center">
 							<User size={20} className="text-white" />
 						</div>
 						<div>
-							<p className="text-sm font-medium text-white">El Jay</p>
-							<p className="text-xs text-gray-400">Admin</p>
+							<p className="text-sm font-medium">Thesis Routing System</p>
+							<p className="text-xs text-gray-600">Admin</p>
 						</div>
 					</div>
 				</div>
@@ -123,10 +123,10 @@ const AdminSidebar = () => {
 				<div className="flex justify-center gap-x-3">
 					<Image src={SMCCLogo} alt="SMCC Logo" className="w-12 h-12" />
 					<div className="flex flex-col items-start justify-center">
-						<p className="text-center text-white font-semibold text-sm">
+						<p className="text-center text-smccprimary font-semibold text-sm">
 							Thesis Routing System
 						</p>
-						<p className="text-center text-white text-xs">
+						<p className="text-center text-gray-600 text-xs">
 							St. Michael's College of Caraga
 						</p>
 					</div>
@@ -134,15 +134,12 @@ const AdminSidebar = () => {
 				{/* Logout Button */}
 				<button
 					type="button"
-					className="m-3 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors duration-200 group"
+					className="m-3 p-2 rounded-lg bg-smccprimary transition-colors duration-200 group"
 					onClick={handleLogout}
 				>
 					<div className="flex items-center justify-center space-x-2">
-						<LogOut
-							size={18}
-							className="text-gray-300 group-hover:text-white"
-						/>
-						<span className="text-sm text-gray-300 group-hover:text-white">
+						<LogOut size={18} className="text-white group-hover:text-white" />
+						<span className="text-sm text-gray-100 group-hover:text-white">
 							Log Out
 						</span>
 					</div>

@@ -23,7 +23,10 @@ const Page = () => {
 
 	const { registerPanel } = useAuthStore((state) => state);
 	const departmentOptions = [
-		{ value: 'CTHM', label: 'College of Tourism, Hospitality, Business, and Management' },
+		{
+			value: 'CTHM',
+			label: 'College of Tourism, Hospitality, Business, and Management',
+		},
 		{ value: 'CTE', label: 'College of Teacher Education' },
 		{ value: 'CAS', label: 'College of Arts and Sciences' },
 		{ value: 'CCIS', label: 'College of Computing and Information Sciences' },
@@ -42,19 +45,23 @@ const Page = () => {
 			alert('Passwords do not match');
 			return;
 		}
-		if (!idnumber || !name || !password || !confirmPassword || !department || !position) {
+		if (
+			!idnumber ||
+			!name ||
+			!password ||
+			!confirmPassword ||
+			!department ||
+			!position
+		) {
 			alert('Please fill in all fields');
 			return;
 		}
 		setRegisterLoading(true);
 		try {
-			await registerPanel(idnumber, password, 
-				panelModel(
-					idnumber,
-					name,
-					department,
-					position,
-				)
+			await registerPanel(
+				idnumber,
+				password,
+				panelModel(idnumber, name, department, position)
 			);
 			setIdnumber('');
 			setName('');
@@ -73,19 +80,53 @@ const Page = () => {
 		<>
 			<div className="flex items-center justify-center min-h-screen p-4">
 				<div className="bg-white shadow-md rounded-lg w-full max-w-md p-8">
-					<h1 className="text-lg font-semibold text-center text-gray-800 mb-6">Register as Panel</h1>
-
-					<TRSInput label="Employee ID" placeholder="Enter your ID Number" value={idnumber} onChange={(e) => setIdnumber(e.target.value)} />
-					<TRSInput label="Password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} type="password" />
-					<TRSInput label="Confirm Password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type="password" />
-					<TRSInput label="Complete Name" placeholder="Enter your Complete Name" value={name} onChange={(e) => setName(e.target.value)} />
-					<TRSDropdown label="College" options={departmentOptions} onSelect={setDepartment} value={department} /> {/* Ensure the value is controlled */}
-					<TRSDropdown label="Position" options={positionOptions} onSelect={setPosition} value={position} /> {/* Ensure the value is controlled */}
-
+					<h1 className="text-lg font-semibold text-center text-gray-800 mb-6">
+						Register as Panel
+					</h1>
+					<TRSInput
+						label="Employee ID"
+						placeholder="Enter your ID Number"
+						value={idnumber}
+						onChange={(e) => setIdnumber(e.target.value)}
+					/>
+					<TRSInput
+						label="Password"
+						placeholder="Enter your password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						type="password"
+					/>
+					<TRSInput
+						label="Confirm Password"
+						placeholder="Confirm your password"
+						value={confirmPassword}
+						onChange={(e) => setConfirmPassword(e.target.value)}
+						type="password"
+					/>
+					<TRSInput
+						label="Complete Name"
+						placeholder="Enter your Complete Name"
+						value={name}
+						onChange={(e) => setName(e.target.value)}
+					/>
+					<TRSDropdown
+						label="College"
+						options={departmentOptions}
+						onSelect={setDepartment}
+						value={department}
+					/>{' '}
+					{/* Ensure the value is controlled */}
+					<TRSDropdown
+						label="Position"
+						options={positionOptions}
+						onSelect={setPosition}
+						value={position}
+					/>{' '}
+					{/* Ensure the value is controlled */}
 					<div className="mt-6 text-center">
-						<TRSButton 
-							label={`${registerLoading ? 'Submitting....' : 'Submit Register'}`} 
-							onClick={handleRegister} 
+						<TRSButton
+							label={`${registerLoading ? 'Loading...' : 'Register Panel'}`}
+							onClick={handleRegister}
 							className="w-full bg-smccprimary text-white py-2 rounded-lg hover:bg-blue-700 transition hover:shadow-lg"
 						/>
 					</div>
