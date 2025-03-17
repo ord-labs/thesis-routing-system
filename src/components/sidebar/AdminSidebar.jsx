@@ -14,6 +14,8 @@ import SidebarSection from './SidebarSection';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import SMCCLogo from '../../../public/smcc-logo-2.png';
+import Image from 'next/image';
 
 const sidebarSections = [
 	{
@@ -118,7 +120,17 @@ const AdminSidebar = () => {
 						/>
 					))}
 				</nav>
-
+				<div className="flex justify-center gap-x-3">
+					<Image src={SMCCLogo} alt="SMCC Logo" className="w-12 h-12" />
+					<div className="flex flex-col items-start justify-center">
+						<p className="text-center text-white font-semibold text-sm">
+							Thesis Routing System
+						</p>
+						<p className="text-center text-white text-xs">
+							St. Michael's College of Caraga
+						</p>
+					</div>
+				</div>
 				{/* Logout Button */}
 				<button
 					type="button"
