@@ -385,7 +385,7 @@ export const useThesisStore = create((set) => ({
 				const panelIds = paperData.panelIds;
 				const allApproved = Object.values(panelIds).length > 0 && Object.values(panelIds).every(panel => panel.approved);
 
-				const status = allApproved ? 'approved' : 'not approved';
+				const status = allApproved && Object.values(panelIds).length === 4 ? 'approved' : 'not approved';
 				return status;
 			} else {
 				throw new Error('Thesis paper not found');
