@@ -210,9 +210,8 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
 
 			{/* Panel Assignment Modal */}
 			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-				<div className="bg-white p-0 rounded-xl shadow-xl max-w-2xl w-full overflow-hidden">
-					{/* Modal Header */}
-					<div className="bg-indigo-50 p-6 border-b border-indigo-100">
+				{/* Modal Header */}
+				<div className="bg-indigo-50 p-6 border-b border-indigo-100">
 						<div className="flex items-center justify-between">
 							<div>
 								<h2 className="text-2xl font-bold text-gray-800">
@@ -305,7 +304,6 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
 							Assign Panels
 						</button>
 					</div>
-				</div>
 			</Modal>
 		</div>
 	);
