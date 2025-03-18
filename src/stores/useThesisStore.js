@@ -24,6 +24,7 @@ import {
 	where,
 	addDoc,
 	deleteDoc,
+	deleteField
 } from 'firebase/firestore';
 import { app, db } from '../server/firebase' 
 import { studentModel } from '../models/studentModel';
@@ -440,6 +441,13 @@ export const useThesisStore = create((set) => ({
 					updateData[`panelIds.${panelId}.panelId`] = panelId;
 					updateData[`panelIds.${panelId}.approved`] = false;
 				});
+
+				const existingPanelIds = paperSnap.data().panelIds;
+				Object.keys(existingPanelIds).forEach((panelId) => {
+					if (!panelIds.includes(panelId)) {
+						updateData[`panelIds.${panelId}`] = deleteField()
+					}
+				});
 			}
 			await updateDoc(paperRef, updateData);			
 		} catch (error) {
@@ -455,9 +463,6 @@ export const useThesisStore = create((set) => ({
 			if (paperSnap.exists()) {
 				const paperData = paperSnap.data();
 				
-				// ang e return ani is ang mga panelIds sa thesisPaper 
-				// to access the panelid kay paperData.panelIds.panelId
-				// dayon pag implement ani sa frontend kay e match ra ang panelIds diri to the panelids nga na fetch sa fetchPanel() na function 
 				return paperData.panelIds;
 			} else {
 				throw new Error('Thesis paper not found');
