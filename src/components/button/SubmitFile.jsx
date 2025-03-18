@@ -45,6 +45,7 @@ const SubmitFile = () => {
 
   const onError = (err) => {
     console.error("Upload Error:", err);
+    alert("Error uploading file");
     setUploading(false);
   };
 
@@ -101,7 +102,7 @@ const SubmitFile = () => {
           <h2 className="text-xl font-bold mb-3">Choose Adviser before uploading</h2>
           
           <h2 className="text-md font-bold text-red-600 my-2">Follow Naming Convention <br /> Ex: Group1_ESP32WifiServers_2025-03-01.pdf</h2>
-          <div className="flex flex-col gap-4 my-5 max-h-68 overflow-y-auto">
+          <div className="flex flex-col gap-4 my-5 max-h-72 overflow-y-auto">
             {advisers.map((adviser) => (
               <div
                 className={`${
