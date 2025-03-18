@@ -184,21 +184,18 @@ const Page = () => {
 				</label>
 
 				<TRSInput
-					// label={'Member 1'}
 					placeholder={'Enter your Member 1 Name'}
 					value={member1}
 					onChange={(e) => setMember1(e.target.value)}
 				/>
 
 				<TRSInput
-					// label={'Member 2'}
 					placeholder={'Enter your Member 2 Name'}
 					value={member2}
 					onChange={(e) => setMember2(e.target.value)}
 				/>
 
 				<TRSInput
-					// label={'Member 3'}
 					placeholder={'Enter your Member 3 Name'}
 					value={member3}
 					onChange={(e) => setMember3(e.target.value)}
@@ -240,6 +237,21 @@ const Page = () => {
 					label={`${
 						loginLoading ? 'Submitting registration...' : 'Submit Registration'
 					}`}
+					disabled={
+						!idnumber ||
+						!name ||
+						!password ||
+						!confirmPassword ||
+						!member1 ||
+						!member2 ||
+						!member3 ||
+						!schoolYear ||
+						!selectedCollege ||
+						!selectedCourse ||
+						!selectedAdviser ||
+						!selectedGroupNumber ||
+						!passwordMatched
+					}
 					onClick={handleRegister}
 				/>
 				<p className="text-center text-sm">
