@@ -5,6 +5,7 @@ import { Settings, Check } from 'lucide-react';
 import { useThesisStore } from '../../stores/useThesisStore';
 import Modal from '../modal/Modal';
 import downloadPDF from './pdfDownloader';
+import { usePathname } from 'next/navigation';
 
 // Optional: If you're using the CertificateOfEndorsement, uncomment this import
 // import CertificateOfEndorsement from '../pdf/CertificateOfEndorsement';
@@ -15,6 +16,8 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
 	const [adviserName, setAdviserName] = useState('');
 	const [studentNames, setStudentNames] = useState([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const path = usePathname().split('/')[3];
+
 
 	// List of all panels from Firestore
 	const [panels, setPanels] = useState([]);
@@ -140,13 +143,14 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
 	return (
 		<div className="w-[90%] md:w-80 flex flex-col items-center border shadow-md rounded-lg relative group">
 			{/* Settings icon for panel assignment */}
-			<button
+			{path !== 'route-2' 
+			&& <button
 				onClick={openPanelModal}
 				className="absolute top-2 right-2 p-2 rounded-lg bg-white/90 backdrop-blur-sm shadow-sm border border-gray-300 hover:bg-indigo-50 transition-all"
 				title="Assign Panel"
 			>
 				<Settings className="w-5 h-5 text-smccprimary hover:text-indigo-600 transition-colors" />
-			</button>
+			</button>}
 
 			{/* PDF Thumbnail */}
 			<a

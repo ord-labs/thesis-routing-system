@@ -24,7 +24,8 @@ import {
 	where,
 	addDoc,
 	deleteDoc,
-	deleteField
+	deleteField,
+	arrayUnion
 } from 'firebase/firestore';
 import { app, db } from '../server/firebase' 
 import { studentModel } from '../models/studentModel';
@@ -169,7 +170,36 @@ export const useThesisStore = create((set) => ({
 	getPanelPapers: async (panelId) => { 
 		try {
 			set({ loading: true });
+
+			
 			const route = useThesisStore.getState().getCurrentRoute();
+			if (route === '/proposal/route-2' || route === '/final/route-2') {
+				const panelRef = doc(db, 'panel', panelId);
+				const panelSnap = await getDoc(panelRef);
+
+				const students = panelSnap.data().students
+				const studentIds = students?.map(student => student.studentId);
+				
+				const thesisRef = collection(db, 'thesisPaper');
+
+				const snapshot = await getDocs(query(thesisRef, 
+					where('currRoute', '==', route),
+					where('studentId', 'in', studentIds || [])
+				));
+
+				const theses = snapshot.docs.map((doc) => ({
+					id: doc.id,
+					...doc.data(),
+				}))
+				.sort((a, b) => b.createdAt - a.createdAt);
+
+				console.log(theses)
+
+				set({ theses, loading: false });
+
+				return theses;
+			}
+
 			const thesisRef = collection(db, 'thesisPaper');
 	
 			const snapshot = await getDocs(query(thesisRef, where('currRoute', '==', route)));
@@ -196,6 +226,34 @@ export const useThesisStore = create((set) => ({
 			set({ loading: true });
 			
 			const route = useThesisStore.getState().getCurrentRoute(); 
+
+			if (route === '/proposal/route-2' || route === '/final/route-2') {
+				const panelRef = collection(db, 'panel');
+
+				const snapshot = await getDocs(panelRef);
+				snapshot.docs.map(async (doc) => {
+					const panelData = doc.data();
+
+					if(panelData.studentId === studentId) {
+						const thesisRef = collection(db, 'thesisPaper');
+						const snapshot = await getDocs(query(thesisRef, 
+							where('currRoute', '==', route),
+							where('studentId', '==', studentId)
+						));
+
+						const theses = snapshot.docs.map((doc) => ({
+							id: doc.id,
+							...doc.data(),
+						}))
+						.sort((a, b) => b.createdAt - a.createdAt);
+
+						set({ theses, loading: false });
+
+						return theses;
+					}
+
+				})
+			}
 
 			const thesisRef = collection(db, 'thesisPaper');
 			const snapshot = await getDocs(query(thesisRef, 
@@ -242,18 +300,12 @@ export const useThesisStore = create((set) => ({
 
 			const commentRef = collection(db, role, docId, 'comments');
 			const paperRef = doc(db, 'thesisPaper', paperId)
-			if (role === "adviser") {
-				updateData["adviserId.adviserId"] = docId;
-				updateData["adviserId.approved"] = approvedStatus;
-			} else {
+			if (role === "panel") {
 				const panelRef = doc(db, 'panel', docId);
 				const docSnap = await getDoc(panelRef);
 	
-				const label = docSnap.data().position.label;
-				const panelNum = parseInt(label.split(' ')[1], 10);
-	
-				updateData[`panelIds.${panelNum - 1}.panelId`] = docId;
-				updateData[`panelIds.${panelNum - 1}.approved`] = approvedStatus;
+				updateData[`panelIds.${docId}.panelId`] = docId;
+				updateData[`panelIds.${docId}.approved`] = approvedStatus;
 			} 
 			
 			const q = query(commentRef, where("paperId", "==", paperId)); 
@@ -416,6 +468,7 @@ export const useThesisStore = create((set) => ({
 	assignPanelsToPaper: async (paperId, panelIds, docId) => {
 		try {
 			let updateData = {};
+			let panelUpdatePromises = [];
 
 			const paperRef = doc(db, 'thesisPaper', paperId);
 			const paperSnap = await getDoc(paperRef);
@@ -437,9 +490,23 @@ export const useThesisStore = create((set) => ({
 				}
 			} else {
 				// Fallback: use first panel's index
-				panelIds.forEach((panelId, index) => {
+				panelIds.forEach( async (panelId, index) => {
+
+					
 					updateData[`panelIds.${panelId}.panelId`] = panelId;
 					updateData[`panelIds.${panelId}.approved`] = false;
+					
+					const panelRef = doc(db, 'panel', panelId);
+					const panelSnap = await getDoc(panelRef);
+
+					const student = {
+						studentId: paperSnap.data().studentId
+					}
+
+					panelUpdatePromises.push(updateDoc(panelRef, {
+						students: arrayUnion(student)
+					}));
+
 				});
 
 				const existingPanelIds = paperSnap.data().panelIds;
@@ -449,7 +516,11 @@ export const useThesisStore = create((set) => ({
 					}
 				});
 			}
-			await updateDoc(paperRef, updateData);			
+			
+			const paperUpdatePromise = updateDoc(paperRef, updateData);
+
+			// Run all updates in parallel
+			await Promise.all([...panelUpdatePromises, paperUpdatePromise]);
 		} catch (error) {
 			console.error('Error assigning panels:', error);
 		}
