@@ -69,7 +69,7 @@ const Page = () => {
 			setConfirmPassword('');
 			setDepartment('');
 			setPosition('');
-			router.push('/admin/register/panel');
+			alert('Panel registered successfully');
 		} catch (error) {
 			alert(`Registration Error: ${error.message}`);
 		}
@@ -80,7 +80,7 @@ const Page = () => {
 		<>
 			<div className="flex items-center justify-center min-h-screen p-4">
 				<div className="bg-white shadow-md rounded-lg w-full max-w-md p-8">
-					<h1 className="text-lg font-semibold text-center text-gray-800 mb-6">
+					<h1 className="text-lg font-semibold text-center text-smccprimary mb-6">
 						Register as Panel
 					</h1>
 					<TRSInput

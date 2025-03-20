@@ -51,7 +51,7 @@ const Page = () => {
 			setPassword('');
 			setConfirmPassword('');
 			setDepartment('');
-			router.push('/admin/register/adviser');
+			alert('Adviser registered successfully');
 		} catch (error) {
 			alert(`Registration Error: ${error.message}`);
 		}
@@ -62,7 +62,7 @@ const Page = () => {
 		<>
 			<div className="flex items-center justify-center min-h-screen p-4">
 				<div className="bg-white shadow-md rounded-lg w-full max-w-md p-8">
-					<h1 className="text-lg font-semibold text-center text-gray-800 mb-6">
+					<h1 className="text-lg font-semibold text-center text-smccprimary mb-6">
 						Register as Adviser
 					</h1>
 
@@ -105,7 +105,7 @@ const Page = () => {
 						<TRSButton
 							label={`${registerLoading ? 'Loading...' : 'Register Adviser'}`}
 							onClick={handleRegister}
-							className="w-full bg-smccprimary text-white py-2 rounded-lg hover:bg-blue-700 transition hover:shadow-lg mx-auto"
+							className="w-full bg-smccprimary text-white py-2 rounded-lg hover:bg-blue-700 transition hover:shadow-lg"
 						/>
 					</div>
 				</div>
