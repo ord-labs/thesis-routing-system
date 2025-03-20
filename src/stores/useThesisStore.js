@@ -167,13 +167,35 @@ export const useThesisStore = create((set) => ({
 		}
 	},
 
+	filterPapers: async (college) => {
+		set({ loading: true });
+		
+		const route = useThesisStore.getState().getCurrentRoute(); 
+			
+		const thesisRef = collection(db, 'thesisPaper');
+		const papersSnap = await getDocs(query(thesisRef, where('currRoute', '==', route)));
+
+		const theses = papersSnap.docs.filter((doc) => doc.data().college && doc.data().college === college).map((doc) => {
+		  return { id: doc.id, ...doc.data() }
+		}).sort((a, b) => b.createdAt - a.createdAt); 
+
+		set({ theses, loading: false });
+			
+		return theses;
+	  },
+
 	getPanelPapers: async (panelId) => { 
 		try {
 			set({ loading: true });
 
 			
 			const route = useThesisStore.getState().getCurrentRoute();
-			if (route === '/proposal/route-2' || route === '/final/route-2') {
+			if (
+				route === '/proposal/route-2' || 
+				route === '/final/route-2' || 
+				route === '/proposal/route-3' || 
+				route === '/final/route-3'
+			) {
 				const panelRef = doc(db, 'panel', panelId);
 				const panelSnap = await getDoc(panelRef);
 
@@ -279,7 +301,17 @@ export const useThesisStore = create((set) => ({
 	createThesis: async (thesis) => {
 		try {
 			set({ loading: true });
-			const thesisRef = await addDoc(collection(db, 'thesisPaper'), thesis);
+
+			const studentId = thesis.studentId;
+
+			const studentRef = doc(db, 'student', studentId);
+			const studentSnap = await getDoc(studentRef)
+
+			const college = studentSnap.data().college.value
+			
+			const thesisWithCollege = { ...thesis, college }; 
+
+			const thesisRef = await addDoc(collection(db, 'thesisPaper'), thesisWithCollege);
 			set((state) => ({
 				theses: [
 					{ id: thesisRef.id, ...thesis },

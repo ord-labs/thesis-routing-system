@@ -206,7 +206,7 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
 
 			<a
 				href={pdfUrl}
-				className="w-full flex items-center h-full border-b border-gray-300 bg-white rounded-t-lg"
+				className="w-full flex items-center h-[400px] border-b border-gray-300 bg-white rounded-t-lg"
 				target="_blank"
 				rel="noopener noreferrer"
 			>

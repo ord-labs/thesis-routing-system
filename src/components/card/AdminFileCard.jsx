@@ -143,7 +143,7 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
 	return (
 		<div className="w-[90%] md:w-80 flex flex-col items-center border shadow-md rounded-lg relative group">
 			{/* Settings icon for panel assignment */}
-			{path !== 'route-2' 
+			{path === 'route-1'   
 			&& <button
 				onClick={openPanelModal}
 				className="absolute top-2 right-2 p-2 rounded-lg bg-white/90 backdrop-blur-sm shadow-sm border border-gray-300 hover:bg-indigo-50 transition-all"
@@ -155,7 +155,7 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
 			{/* PDF Thumbnail */}
 			<a
 				href={pdfUrl}
-				className="w-full flex items-center h-full bg-white rounded-t-lg"
+				className="w-full flex items-center h-[400px] bg-white rounded-t-lg"
 				target="_blank"
 				rel="noopener noreferrer"
 			>
@@ -163,7 +163,7 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
 					<img
 						src={thumbnailUrl}
 						alt="PDF Preview"
-						className="w-full"
+						className="w-full h-full"
 						onError={(e) => (e.target.src = 'https://via.placeholder.com/150')}
 					/>
 				) : (
@@ -268,7 +268,7 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
 									>
 										<div className="flex items-center justify-between">
 											<h4 className="font-medium text-gray-800">
-												{panel.name}
+												{panel.name} - {panel.position.label}
 											</h4>
 											<div
 												className={`w-6 h-6 rounded-full border-2 flex items-center justify-center

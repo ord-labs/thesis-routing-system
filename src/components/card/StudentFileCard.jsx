@@ -51,7 +51,7 @@ const StudentFileCard = ({ pdfUrl, paperId, onDelete }) => {
 		<div className="w-[90%] bg-white md:w-80 flex flex-col items-center  border shadow-md  rounded-lg ">
 			<a
 				href={pdfUrl}
-				className=" w-full flex items-center h-full rounded-t-lg"
+				className=" w-full flex items-center h-[400px] rounded-t-lg"
 				target="_blank"
 				rel="noopener noreferrer"
 			>

@@ -223,7 +223,7 @@ const Page = () => {
 					label="College"
 					options={collegeOptions}
 					onSelect={setSelectedCollege}
-				/>
+				/>	
 				{selectedCollege !== '' && (
 					<TRSDropdown
 						label="Course"
