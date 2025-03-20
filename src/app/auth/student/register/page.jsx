@@ -19,11 +19,9 @@ const Page = () => {
 	const [name, setName] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
-	const [member1, setMember1] = useState('');
-	const [member2, setMember2] = useState('');
-	const [member3, setMember3] = useState('');
+	const [memberCount, setMemberCount] = useState(1);
+	const [membersList, setMembersList] = useState([]);
 	const [schoolYear, setSchoolYear] = useState('');
-
 	const [selectedOption, setSelectedOption] = useState('');
 	const [selectedCollege, setSelectedCollege] = useState('');
 	const [selectedCourse, setSelectedCourse] = useState('');
@@ -86,7 +84,7 @@ const Page = () => {
 				selectedCollege,
 				selectedAdviser,
 				selectedGroupNumber,
-				[member1, member2, member3]
+				membersList
 			)
 		);
 
@@ -103,6 +101,10 @@ const Page = () => {
 
 		setLoginLoading(false);
 	};
+
+	useEffect(() => {
+		console.log(membersList);
+	}, [membersList]);
 
 	useEffect(() => {
 		if (password === confirmPassword) {
@@ -179,27 +181,36 @@ const Page = () => {
 					onChange={(e) => setName(e.target.value)}
 				/>
 
-				<label className="mb-2 text-sm font-medium text-gray-700">
-					Group Members
-				</label>
+				<div className="flex justify-between items-center mb-2">
+					<div>
+						<label className="mb-2 text-sm font-medium text-gray-700">
+							Group Members
+						</label>
+					</div>
+					<div>
+						<button
+							className="text-sm bg-smccprimary text-white px-2 py-2 rounded-lg hover:bg-blue-600"
+							onClick={() => setMemberCount(memberCount + 1)}
+						>
+							+ Add Members
+						</button>
+					</div>
+				</div>
 
-				<TRSInput
-					placeholder={'Enter your Member 1 Name'}
-					value={member1}
-					onChange={(e) => setMember1(e.target.value)}
-				/>
-
-				<TRSInput
-					placeholder={'Enter your Member 2 Name'}
-					value={member2}
-					onChange={(e) => setMember2(e.target.value)}
-				/>
-
-				<TRSInput
-					placeholder={'Enter your Member 3 Name'}
-					value={member3}
-					onChange={(e) => setMember3(e.target.value)}
-				/>
+				{Array.from({ length: memberCount }).map((_, index) => {
+					return (
+						<TRSInput
+							key={index}
+							placeholder={`Enter your Member ${index + 1} Name`}
+							value={membersList[index] || ''}
+							onChange={(e) => {
+								const updatedMembersList = [...membersList];
+								updatedMembersList[index] = e.target.value;
+								setMembersList(updatedMembersList);
+							}}
+						/>
+					);
+				})}
 
 				<TRSInput
 					label={'School Year'}
@@ -242,9 +253,7 @@ const Page = () => {
 						!name ||
 						!password ||
 						!confirmPassword ||
-						!member1 ||
-						!member2 ||
-						!member3 ||
+						!membersList ||
 						!schoolYear ||
 						!selectedCollege ||
 						!selectedCourse ||
