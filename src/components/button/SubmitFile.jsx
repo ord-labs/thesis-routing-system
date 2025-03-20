@@ -107,22 +107,29 @@ const SubmitFile = () => {
 				}}
 			>
 				<div className="flex flex-col">
-					<h2 className="text-xl font-bold mb-3">
-						Choose Adviser before uploading
-					</h2>
-
-					<h2 className="text-md font-bold text-red-600 my-2">
-						Follow Naming Convention <br /> Ex:
-						Group1_ESP32WifiServers_2025-03-01.pdf
-					</h2>
+					<h2 className="text-xl font-semibold mb-3">Upload your file here</h2>
+					<div className="text-sm">
+						<p>
+							File naming convention: Group{'<#>'}_{'<ThesisTitle>'}_
+							{'<Date-Uploaded>'}.pdf
+						</p>
+						<p className="text-smccprimary font-semibold">
+							e.g. Group1_ESP32WifiServers_2025-03-01.pdf
+						</p>
+					</div>
+					<div className="flex bg-red-50 border border-red-400 rounded-lg p-2 mt-8">
+						<p className="text-red-700">
+							Choose adviser to proceed to uploading.
+						</p>
+					</div>
 					<div className="flex flex-col gap-4 my-5 max-h-72 overflow-y-auto">
 						{advisers.map((adviser) => (
 							<div
 								className={`${
 									chosenAdviser.id === adviser.id
-										? 'bg-gray-400'
-										: 'bg-gray-600'
-								} transition-colors duration-500 ease-in-out cursor-pointer w-full p-4 rounded-lg`}
+										? 'bg-smccprimary text-white'
+										: 'bg-white border border-gray-300 text-gray-700'
+								} cursor-pointer w-full p-4 rounded-lg hover:bg-gray-200`}
 								onClick={() => {
 									setChosenAdviser(adviser);
 									setIsadviserChosen(true);
@@ -148,11 +155,11 @@ const SubmitFile = () => {
 						/>
 						<button
 							onClick={() => ikUploadRef.current.click()}
-							className={` font-bold text-lg ${
+							className={`text-sm ${
 								isAdviserChosen
-									? 'bg-blue-600  cursor-pointer'
-									: ' bg-blue-900 pointer-events-none '
-							}  w-full rounded-lg p-4`}
+									? 'bg-smccprimary cursor-pointer'
+									: ' bg-gray-600 pointer-events-none '
+							}  w-full rounded-lg py-2 text-white`}
 							type="button"
 							disabled={uploading || !isAdviserChosen}
 						>
