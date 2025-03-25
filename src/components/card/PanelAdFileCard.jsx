@@ -25,10 +25,17 @@ const PanelAdFileCard = ({ pdfUrl, paperId, role }) => {
 		getStatus,
 		getThesisComment,
 		getCurrentPaper,
+		checkExpiryDate
 	} = useThesisStore((state) => state);
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [successMessage, setSuccessMessage] = useState('');
+
+	if (role === 'panel') {
+		setInterval(() => {
+		  checkExpiryDate(paperId, Cookies.get('panelId'));
+		}, 60000);
+	}
 
 	useEffect(() => {
 		if (pdfUrl) {

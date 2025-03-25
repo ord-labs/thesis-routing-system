@@ -325,6 +325,26 @@ export const useThesisStore = create((set) => ({
 		}
 	},
 
+	checkExpiryDate: async (paperId, panelId) => {
+		try {
+			const thesisRef = doc(db, 'thesisPaper', paperId);
+
+			const docSnap = await getDoc(thesisRef);
+
+			if (docSnap.exists()) {
+				const panelData = docSnap.data().panelIds?.[panelId];
+			
+				if (!panelData?.approved) { 
+					await updateDoc(thesisRef, {
+						[`panelIds.${panelId}.approved`]: true
+					});
+				}
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	},
+
 	createThesisComment: async (comment, role, docId, paperId, approvedStatus) => {
 		try {
 
@@ -499,8 +519,11 @@ export const useThesisStore = create((set) => ({
 
 	assignPanelsToPaper: async (paperId, panelIds, docId) => {
 		try {
-			let updateData = {};
 			let panelUpdatePromises = [];
+			const expiryDate = new Date()
+			expiryDate.setMinutes(expiryDate.getMinutes() + 2); 
+
+			let updateData = { expiryDate };
 
 			const paperRef = doc(db, 'thesisPaper', paperId);
 			const paperSnap = await getDoc(paperRef);
@@ -518,7 +541,7 @@ export const useThesisStore = create((set) => ({
 					panelIds.forEach((panelId, index) => {
 						updateData[`panelIds.${panelId}.panelId`] = panelId;
 						updateData[`panelIds.${panelId}.approved`] = false;
-					});
+					});				
 				}
 			} else {
 				// Fallback: use first panel's index
