@@ -206,7 +206,6 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
 									studentNames,
 								})
 							}
-							s
 							className="w-full bg-smccprimary text-white text-xs px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-all"
 						>
 							Download Endorsement

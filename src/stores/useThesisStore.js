@@ -519,67 +519,67 @@ export const useThesisStore = create((set) => ({
 
 	assignPanelsToPaper: async (paperId, panelIds, docId) => {
 		try {
-			let panelUpdatePromises = [];
-			const expiryDate = new Date()
-			expiryDate.setMinutes(expiryDate.getMinutes() + 2); 
-
-			let updateData = { expiryDate };
-
-			const paperRef = doc(db, 'thesisPaper', paperId);
-			const paperSnap = await getDoc(paperRef);
-
-			// If docId is provided, get its label for panel numbering
-			if (docId) {
-				const panelRef = doc(db, 'panel', docId);
-				const panelSnap = await getDoc(panelRef);
-				
-				if (panelSnap.exists()) {
-					const label = panelSnap.data().position?.label || 'Panel 1';
-					const panelNum = parseInt(label.split(' ')[1], 10) || 1;
-
-					// Update each panel ID
-					panelIds.forEach((panelId, index) => {
-						updateData[`panelIds.${panelId}.panelId`] = panelId;
-						updateData[`panelIds.${panelId}.approved`] = false;
-					});				
-				}
-			} else {
-				// Fallback: use first panel's index
-				panelIds.forEach( async (panelId, index) => {
-
-					
-					updateData[`panelIds.${panelId}.panelId`] = panelId;
-					updateData[`panelIds.${panelId}.approved`] = false;
-					
-					const panelRef = doc(db, 'panel', panelId);
-					const panelSnap = await getDoc(panelRef);
-
-					const student = {
-						studentId: paperSnap.data().studentId
-					}
-
-					panelUpdatePromises.push(updateDoc(panelRef, {
-						students: arrayUnion(student)
-					}));
-
-				});
-
-				const existingPanelIds = paperSnap.data().panelIds;
-				Object.keys(existingPanelIds).forEach((panelId) => {
-					if (!panelIds.includes(panelId)) {
-						updateData[`panelIds.${panelId}`] = deleteField()
-					}
-				});
+		  // Filter out any invalid panel IDs (undefined, null, empty strings)
+		  panelIds = panelIds.filter((id) => id);
+	  
+		  let panelUpdatePromises = [];
+		  const expiryDate = new Date();
+		  expiryDate.setMinutes(expiryDate.getMinutes() + 2);
+	  
+		  let updateData = { expiryDate };
+	  
+		  const paperRef = doc(db, 'thesisPaper', paperId);
+		  const paperSnap = await getDoc(paperRef);
+	  
+		  if (docId) {
+			// If a specific docId is provided, use its label (if needed)
+			const panelRef = doc(db, 'panel', docId);
+			const panelSnap = await getDoc(panelRef);
+			if (panelSnap.exists()) {
+			  const label = panelSnap.data().position?.label || 'Panel 1';
+			  // Loop through the panelIds and update Firestore accordingly
+			  panelIds.forEach((panelId) => {
+				updateData[`panelIds.${panelId}.panelId`] = panelId;
+				updateData[`panelIds.${panelId}.approved`] = false;
+			  });
 			}
-			
-			const paperUpdatePromise = updateDoc(paperRef, updateData);
-
-			// Run all updates in parallel
-			await Promise.all([...panelUpdatePromises, paperUpdatePromise]);
+		  } else {
+			// For the fallback case when no specific docId is provided
+			for (const panelId of panelIds) {
+			  updateData[`panelIds.${panelId}.panelId`] = panelId;
+			  updateData[`panelIds.${panelId}.approved`] = false;
+	  
+			  const panelRef = doc(db, 'panel', panelId);
+			  // (Optional) Fetch panel data if needed
+			  await getDoc(panelRef);
+	  
+			  const student = { studentId: paperSnap.data().studentId };
+			  panelUpdatePromises.push(
+				updateDoc(panelRef, {
+				  students: arrayUnion(student),
+				})
+			  );
+			}
+	  
+			// Remove any previously assigned panel IDs that are no longer in the panelIds array
+			const existingPanelIds = paperSnap.data().panelIds || {};
+			Object.keys(existingPanelIds).forEach((existingPanelId) => {
+			  if (!panelIds.includes(existingPanelId)) {
+				updateData[`panelIds.${existingPanelId}`] = deleteField();
+			  }
+			});
+		  }
+	  
+		  // Update the thesisPaper document with the new panel assignments
+		  const paperUpdatePromise = updateDoc(paperRef, updateData);
+	  
+		  // Run all update operations in parallel
+		  await Promise.all([...panelUpdatePromises, paperUpdatePromise]);
 		} catch (error) {
-			console.error('Error assigning panels:', error);
+		  console.error('Error assigning panels:', error);
 		}
-	},
+	  },
+	  
 
 	fetchPanelsAssigned: async (paperId) => {
 		try {
