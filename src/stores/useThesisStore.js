@@ -517,11 +517,12 @@ export const useThesisStore = create((set) => ({
 		}
 	},
 
-	assignPanelsToPaper: async (paperId, panelIds, docId) => {
+	assignPanelsToPaper: async (paperId, panelIds, expiry, docId ) => {
 		try {
 			let panelUpdatePromises = [];
 			const expiryDate = new Date()
-			expiryDate.setMinutes(expiryDate.getMinutes() + 2); 
+			
+			expiryDate.setDate(expiryDate.getDate() + parseInt(expiry, 10));
 
 			let updateData = { expiryDate };
 
