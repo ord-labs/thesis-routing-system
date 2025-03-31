@@ -476,7 +476,7 @@ export const useThesisStore = create((set) => ({
   // ─────────────────────────────────────────────────────────────────────────────
   // UPDATED assignPanelsToPaper with .filter() to remove undefined IDs
   // ─────────────────────────────────────────────────────────────────────────────
-  assignPanelsToPaper: async (paperId, panelIds = [], docId) => {
+  assignPanelsToPaper: async (paperId, panelIds = [], expiry, docId) => {
     try {
       console.log('assignPanelsToPaper called with:', { paperId, panelIds, docId });
 
@@ -486,7 +486,8 @@ export const useThesisStore = create((set) => ({
 
       let panelUpdatePromises = [];
       const expiryDate = new Date();
-      expiryDate.setMinutes(expiryDate.getMinutes() + 2);
+      
+			expiryDate.setDate(expiryDate.getDate() + parseInt(expiry, 10));
 
       let updateData = { expiryDate };
 

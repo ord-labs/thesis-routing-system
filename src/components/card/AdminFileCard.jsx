@@ -13,7 +13,8 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
   const [adviserName, setAdviserName] = useState('');
   const [studentNames, setStudentNames] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const path = usePathname().split('/');
+  const path = usePathname().split('/');  
+	const [expiry, setExpiry] = useState('');
 
   const proposalRoute = path.slice(2).join('/');
 
@@ -118,23 +119,37 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
   // ASSIGN SELECTED PANELS TO THE PAPER, THEN REFRESH THE ASSIGNMENT LIST
   // ─────────────────────────────────────────────────────────────────────────────
   const handlePanelAssignment = async () => {
-    if (selectedPanelIds.length > 0) {
-      try {
-        console.log('handlePanelAssignment => selectedPanelIds:', selectedPanelIds);
-        // Assign the selected panels in Firestore
-        await assignPanelsToPaper(paperId, selectedPanelIds);
+		if (selectedPanelIds.length > 0) {
+			if (!expiry || isNaN(parseInt(expiry, 10)) || parseInt(expiry, 10) <= 0) {
+				alert("Please enter a valid expiry date (positive number of days).");
+				return; 
+			}
 
-        // Close the modal
-        setIsModalOpen(false);
+			try {
+				// Assign the selected panels in Firestore
+				await assignPanelsToPaper(paperId, selectedPanelIds);
 
-        // Fetch the updated assignments so the UI knows which are assigned
-        const updatedPanelAssignments = (await fetchPanelsAssigned(paperId)) || [];
-        setAssignedPanels(Array.isArray(updatedPanelAssignments) ? updatedPanelAssignments : Object.values(updatedPanelAssignments));
-      } catch (error) {
-        console.error('Error assigning panels:', error);
-      }
-    }
-  };
+				// Close the modal
+				await assignPanelsToPaper(paperId, selectedPanelIds, expiry);
+
+				setIsModalOpen(false);
+
+				// Fetch the updated assignments so the UI knows which are assigned
+				const updatedPanelAssignments =
+					(await fetchPanelsAssigned(paperId)) || [];
+				setExpiry('');
+
+				const updatedPanelAssignments = (await fetchPanelsAssigned(paperId)) || [];
+				setAssignedPanels(updatedPanelAssignments);
+			} catch (error) {
+				console.error('Error assigning panels:', error);
+				alert("An error occurred while assigning panels. Please try again.");
+				console.error("Error in nt:", error);
+			}
+		} else {
+			alert("Please select at least one panel.");
+		}
+	};
 
   // Current date if needed for debugging or PDF
   const currentDate = new Date().toLocaleDateString();
@@ -281,6 +296,7 @@ const AdminFileCard = ({ pdfUrl, paperId, showDownloadLink }) => {
 
         {/* Modal Footer */}
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
+        	<input type="text" placeholder='Expiry Duration (Days)' onChange={(e) => setExpiry(e.target.value)} className='p-2 rounded-lg focus:outline-none bg-white' />
           <button
             onClick={() => setIsModalOpen(false)}
             className="px-5 py-2 text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
