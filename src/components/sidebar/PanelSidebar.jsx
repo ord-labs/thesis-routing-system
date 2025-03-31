@@ -3,12 +3,9 @@
 import { useEffect, useState } from 'react';
 import {
 	LogOut,
-	LayoutDashboard,
 	BookOpen,
-	UserPlus,
 	FileText,
 	User,
-	Settings,
 	Menu,
 	X,
 } from 'lucide-react';
@@ -34,18 +31,45 @@ const PanelSidebar = () => {
 
 	useEffect(() => {
 		const getUser = async () => {
-			const role = Cookies.get('role');
-			const panelId = Cookies.get('panelId');
+			try {
+				// Retrieve cookie values
+				const roleCookie = Cookies.get('role');
+				const panelId = Cookies.get('panelId');
+				console.log("Role cookie:", roleCookie);
+				console.log("PanelId cookie:", panelId);
 
-			const currentUser = await getUserDetails(role, panelId);
+				// For PanelSidebar, if panelId exists, override the role to "panel"
+				const role = panelId ? "panel" : roleCookie;
+				console.log("Using role for query:", role);
 
-			setUserDetails({
-				name: currentUser.name,
-				role: role,
-			});
+				if (!role || !panelId) {
+					console.error("Missing role or panelId cookie. Please ensure these are set.");
+					return;
+				}
+
+				// Retrieve user details based on role and panelId
+				const currentUser = await getUserDetails(role, panelId);
+				console.log("Current user data:", currentUser);
+
+				if (!currentUser) {
+					console.error("getUserDetails returned undefined. Check the implementation of getUserDetails.");
+					return;
+				}
+
+				if (currentUser.name) {
+					setUserDetails({
+						name: currentUser.name,
+						role: role,
+					});
+				} else {
+					console.error("User data is missing or 'name' is not defined:", currentUser);
+				}
+			} catch (error) {
+				console.error("Error fetching user data:", error);
+			}
 		};
 		getUser();
-	}, []);
+	}, [getUserDetails]);
 
 	const handleLogout = async () => {
 		await logoutUser();
@@ -89,10 +113,10 @@ const PanelSidebar = () => {
 						</div>
 						<div>
 							<p className="text-sm font-medium text-smccprimary">
-								{userDetails.name}
+								{userDetails.name || "Guest"}
 							</p>
 							<p className="text-xs text-gray-400 capitalize">
-								{userDetails.role}
+								{userDetails.role || "No role"}
 							</p>
 						</div>
 					</div>
@@ -144,10 +168,7 @@ const PanelSidebar = () => {
 					onClick={handleLogout}
 				>
 					<div className="flex items-center justify-center space-x-2">
-						<LogOut
-							size={18}
-							className="text-gray-300 group-hover:text-white"
-						/>
+						<LogOut size={18} className="text-gray-300 group-hover:text-white" />
 						<span className="text-sm text-gray-300 group-hover:text-white">
 							Log Out
 						</span>
